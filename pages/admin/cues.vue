@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,8 +9,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -24,64 +34,111 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 // --- State ---
+
 // APIからデータを取得
 const { data: cues, refresh } = await useFetch<Cue[]>('/api/cues', {
   default: () => []
 })
 
+const isDialogOpen = ref(false)
+const editingCue = ref<Cue | null>(null)
 
-const newCue = ref<Omit<Cue, 'id'>>({
+// 新規/編集フォーム用のデータモデル
+const cueFormData = ref<Omit<Cue, 'id'>>({
   name: '',
   type: 'color',
   value: '#000000',
 })
 
-const isDialogOpen = ref(false)
+// ダイアログのタイトルを動的に変更
+const dialogTitle = computed(() => editingCue.value ? '演出を編集' : '新規演出を追加')
+const dialogDescription = computed(() => editingCue.value ? '演出の内容を更新します。' : '新しい演出の詳細を入力してください。')
 
-defineExpose({
-  cues,
-  isDialogOpen,
-})
 
-watch(() => newCue.value.type, (newType) => {
-  if (newType === 'animation') {
-    newCue.value.value = ''
-  } else if (newType === 'color') {
-    newCue.value.value = '#000000'
+// --- Watchers ---
+
+// 演出タイプの変更を監視し、値の初期値を設定
+watch(() => cueFormData.value.type, (newType) => {
+  // 新規追加時のみ、タイプの変更に応じて値を初期化する
+  if (editingCue.value === null) {
+    if (newType === 'animation') {
+      cueFormData.value.value = ''
+    } else if (newType === 'color') {
+      cueFormData.value.value = '#000000'
+    }
   }
 })
 
 
 // --- Handlers ---
+
+// 新規追加ダイアログを開く
+const handleAddNewClick = () => {
+  editingCue.value = null
+  cueFormData.value = {
+    name: '',
+    type: 'color',
+    value: '#000000',
+  }
+  isDialogOpen.value = true
+}
+
+// 編集ダイアログを開く
+const handleEditClick = (cue: Cue) => {
+  editingCue.value = cue
+  // オブジェクトをコピーして、フォームの変更が即座にテーブルに反映されないようにする
+  cueFormData.value = {
+    name: cue.name,
+    type: cue.type,
+    value: cue.value,
+  }
+  isDialogOpen.value = true
+}
+
+// 保存ボタンの処理 (新規/編集)
 const handleSubmit = async () => {
-  if (!newCue.value.name || !newCue.value.value) {
-    // Basic validation
+  if (!cueFormData.value.name || !cueFormData.value.value) {
     alert('演出名と値を入力してください。')
     return
   }
 
   try {
-    await $fetch('/api/cues', {
-      method: 'POST',
-      body: newCue.value,
-    });
-
-    // Reset form and close dialog
-    newCue.value = {
-      name: '',
-      type: 'color',
-      value: '#000000',
+    if (editingCue.value) {
+      // 編集モード
+      await $fetch(`/api/cues/${editingCue.value.id}`, {
+        method: 'PUT',
+        body: cueFormData.value,
+      })
+    } else {
+      // 新規追加モード
+      await $fetch('/api/cues', {
+        method: 'POST',
+        body: cueFormData.value,
+      })
     }
-    isDialogOpen.value = false
 
-    // Refresh the cue list
-    await refresh();
+    isDialogOpen.value = false
+    await refresh() // テーブルを更新
 
   } catch (error) {
-    console.error('Failed to create cue:', error);
-    alert('演出の作成に失敗しました。');
+    console.error('Failed to save cue:', error)
+    alert('演出の保存に失敗しました。')
   }
 }
+
+// 削除処理
+const handleDelete = async (cueId: string) => {
+  try {
+    await $fetch(`/api/cues/${cueId}`, {
+      method: 'DELETE',
+    })
+    await refresh() // テーブルを更新
+  } catch (error) {
+    console.error('Failed to delete cue:', error)
+    alert('演出の削除に失敗しました。')
+  }
+}
+
 </script>
 
 <template>
@@ -89,14 +146,12 @@ const handleSubmit = async () => {
     <header class="mb-8 flex items-center justify-between">
       <h1 class="text-3xl font-bold">演出管理</h1>
       <Dialog v-model:open="isDialogOpen">
-        <DialogTrigger as-child>
-          <Button>新規演出を追加</Button>
-        </DialogTrigger>
+        <Button @click="handleAddNewClick">新規演出を追加</Button>
         <DialogContent class="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>新規演出を追加</DialogTitle>
+            <DialogTitle>{{ dialogTitle }}</DialogTitle>
             <DialogDescription>
-              新しい演出の詳細を入力してください。
+              {{ dialogDescription }}
             </DialogDescription>
           </DialogHeader>
           <div class="grid gap-4 py-4">
@@ -104,13 +159,13 @@ const handleSubmit = async () => {
               <Label for="name" class="text-right">
                 演出名
               </Label>
-              <Input id="name" v-model="newCue.name" class="col-span-3" />
+              <Input id="name" v-model="cueFormData.name" class="col-span-3" />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
               <Label class="text-right">
                 種類
               </Label>
-              <RadioGroup v-model="newCue.type" class="col-span-3 flex items-center space-x-4">
+              <RadioGroup v-model="cueFormData.type" class="col-span-3 flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                   <RadioGroupItem id="r1" value="color" />
                   <Label for="r1">単色</Label>
@@ -127,12 +182,12 @@ const handleSubmit = async () => {
               </Label>
               <Input
                 id="value"
-                v-model="newCue.value"
+                v-model="cueFormData.value"
                 class="col-span-3"
-                :placeholder="newCue.type === 'animation' ? 'lottieのURL' : ''"
+                :placeholder="cueFormData.type === 'animation' ? 'lottieのURL' : ''"
               />
             </div>
-            <div v-if="newCue.type === 'animation'" class="grid grid-cols-4 items-center gap-4 -mt-3">
+            <div v-if="cueFormData.type === 'animation'" class="grid grid-cols-4 items-center gap-4 -mt-3">
               <div class="col-start-2 col-span-3 text-sm">
                 <a href="https://lottiefiles.com/jp/blog/working-with-lottie/how-to-create-lottie-animations-from-scratch" target="_blank" class="text-blue-500 hover:underline">
                   LottieアニメーションのJSONの作り方
@@ -177,8 +232,24 @@ const handleSubmit = async () => {
               </template>
             </TableCell>
             <TableCell class="text-right">
-              <Button variant="outline" size="sm" class="mr-2">編集</Button>
-              <Button variant="destructive" size="sm">削除</Button>
+               <Button variant="outline" size="sm" class="mr-2" @click="handleEditClick(cue)">編集</Button>
+              <AlertDialog>
+                <AlertDialogTrigger as-child>
+                  <Button variant="destructive" size="sm">削除</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>本当に削除しますか？</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      この操作は元に戻せません。「{{ cue.name }}」のデータをサーバーから完全に削除します。
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>キャンセル</AlertDialogCancel>
+                    <AlertDialogAction @click="handleDelete(cue.id)">はい、削除します</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </TableCell>
           </TableRow>
         </TableBody>
