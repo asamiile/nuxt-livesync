@@ -9,7 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -31,11 +31,10 @@
   "packageManager": "pnpm@8.14.0+sha1.bb42032ff80dba5f9245bc1b03470d2fa0b7fb2f",
   "devDependencies": {
     "@nuxt/test-utils": "^3.19.2",
-    "@nuxtjs/tailwindcss": "^6.14.0",
     "@vitest/ui": "^3.2.4",
     "@vue/test-utils": "^2.4.6",
     "happy-dom": "^18.0.1",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
     "@chromatic-com/storybook": "^4.1.1",
     "@nuxtjs/storybook": "^9.0.1",
     "@nuxtjs/tailwindcss": "^6.14.0",
