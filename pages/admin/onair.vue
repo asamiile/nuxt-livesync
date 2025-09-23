@@ -20,6 +20,10 @@ const cues = ref<Cue[]>([
   { id: '8', name: '背景（黄）', type: 'color', value: '#ffff00' },
 ])
 
+defineExpose({
+  cues,
+})
+
 // --- Handlers ---
 const handleButtonClick = (cue: Cue) => {
   console.log(`Button clicked: ${cue.name}`)

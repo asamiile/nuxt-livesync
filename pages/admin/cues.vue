@@ -37,6 +37,11 @@ const newCue = ref<Omit<Cue, 'id'>>({
 
 const isDialogOpen = ref(false)
 
+defineExpose({
+  cues,
+  isDialogOpen,
+})
+
 // --- Handlers ---
 const handleSubmit = () => {
   if (!newCue.value.name || !newCue.value.value) {
