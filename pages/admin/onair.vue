@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const { toast } = useToast()
 
 // --- State ---
