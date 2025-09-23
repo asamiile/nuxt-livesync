@@ -120,6 +120,11 @@ def create_cue(payload: CreateCuePayload):
     kv.set(CUES_KEY, json.dumps(cues_to_save))
     return new_cue
 
+@app.get("/api/connections")
+def get_connections():
+    """現在のWebSocket接続数を取得する"""
+    return {"connections": len(manager.active_connections)}
+
 # --- WebSocketエンドポイント ---
 @app.websocket("/ws/live")
 async def websocket_endpoint(websocket: WebSocket):
