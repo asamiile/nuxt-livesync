@@ -27,7 +27,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 defineProps({
   cues: {
     type: Array as PropType<Cue[]>,
-    default: () => [],
+    default: () => [
+      { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
+      { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/8f4252de-e9e2-4d56-baa4-3adc138510c4/EiPNTtYLyF.lottie' },
+    ],
   },
 })
 

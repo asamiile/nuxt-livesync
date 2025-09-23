@@ -11,7 +11,16 @@ const { toast } = useToast()
 defineProps({
   cues: {
     type: Array as PropType<Cue[]>,
-    default: () => [],
+    default: () => [
+      { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
+      { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/8f4252de-e9e2-4d56-baa4-3adc138510c4/EiPNTtYLyF.lottie' },
+      { id: '3', name: 'インターバル（青）', type: 'color', value: '#0000ff' },
+      { id: '4', name: 'エンディング（黒）', type: 'color', value: '#000000' },
+      { id: '5', name: '汎用アニメーションA', type: 'animation', value: 'https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json' },
+      { id: '6', name: '汎用アニメーションB', type: 'animation', value: 'https://assets1.lottiefiles.com/packages/lf20_u4j3xm6r.json' },
+      { id: '7', name: '背景（緑）', type: 'color', value: '#00ff00' },
+      { id: '8', name: '背景（黄）', type: 'color', value: '#ffff00' },
+    ]
   },
 })
 
