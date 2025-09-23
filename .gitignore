@@ -25,3 +25,6 @@ logs
 
 *storybook.log
 storybook-static
+
+# Python virtual environment
+api/venv
