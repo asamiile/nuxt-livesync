@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import {
@@ -42,6 +42,15 @@ defineExpose({
   cues,
   isDialogOpen,
 })
+
+watch(() => newCue.value.type, (newType) => {
+  if (newType === 'animation') {
+    newCue.value.value = ''
+  } else if (newType === 'color') {
+    newCue.value.value = '#000000'
+  }
+})
+
 
 // --- Handlers ---
 const handleSubmit = async () => {
@@ -116,7 +125,19 @@ const handleSubmit = async () => {
               <Label for="value" class="text-right">
                 値
               </Label>
-              <Input id="value" v-model="newCue.value" class="col-span-3" />
+              <Input
+                id="value"
+                v-model="newCue.value"
+                class="col-span-3"
+                :placeholder="newCue.type === 'animation' ? 'lottieのURL' : ''"
+              />
+            </div>
+            <div v-if="newCue.type === 'animation'" class="grid grid-cols-4 items-center gap-4 -mt-3">
+              <div class="col-start-2 col-span-3 text-sm">
+                <a href="https://lottiefiles.com/jp/blog/working-with-lottie/how-to-create-lottie-animations-from-scratch" target="_blank" class="text-blue-500 hover:underline">
+                  LottieアニメーションのJSONの作り方
+                </a>
+              </div>
             </div>
           </div>
           <DialogFooter>
