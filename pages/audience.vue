@@ -12,31 +12,18 @@
       v-else-if="currentCue?.type === 'animation'"
       class="flex h-full w-full items-center justify-center"
     >
-      <LottiePlayer src="https://lottie.host/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json" />
+      <LottiePlayer v-if="currentCue.value" :src="currentCue.value" />
     </div>
 
     <!-- Waiting State -->
     <div v-else class="flex h-full w-full items-center justify-center bg-gray-800 text-white">
       <h1 class="text-4xl font-bold">待機中...</h1>
     </div>
-
-    <!-- Test Buttons (for development) -->
-    <div class="fixed bottom-5 left-1/2 -translate-x-1/2 transform space-x-4 rounded-lg bg-gray-900 bg-opacity-50 p-4">
-      <button @click="setRed" class="rounded-md bg-red-500 px-4 py-2 font-semibold text-white shadow-lg hover:bg-red-600">
-        赤色を表示
-      </button>
-      <button @click="setAnimation" class="rounded-md bg-blue-500 px-4 py-2 font-semibold text-white shadow-lg hover:bg-blue-600">
-        アニメーションを再生
-      </button>
-      <button @click="resetCue" class="rounded-md bg-gray-500 px-4 py-2 font-semibold text-white shadow-lg hover:bg-gray-600">
-        リセット
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import type { Cue } from '~/types/cue'
 
 // Define the layout for this page
@@ -44,29 +31,63 @@ definePageMeta({
   layout: false, // No layout for this page
 })
 
+const cues = ref<Cue[]>([])
 const currentCue = ref<Cue | null>(null)
+let socket: WebSocket | null = null
 
-const setRed = () => {
-  currentCue.value = {
-    id: 'c1',
-    name: 'Red',
-    type: 'color',
-    value: '#ef4444', // Tailwind's red-500
+onMounted(async () => {
+  // Fetch all cues
+  try {
+    const fetchedCues = await $fetch<Cue[]>('/api/cues', {
+      // baseURLはNuxtのプロキシ設定に任せる
+    })
+    cues.value = fetchedCues
   }
-}
-
-const setAnimation = () => {
-  currentCue.value = {
-    id: 'c2',
-    name: 'Animation',
-    type: 'animation',
-    value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json',
+  catch (error) {
+    console.error('Failed to fetch cues:', error)
+    // エラーハンドリング: 例えば、ユーザーに通知を表示するなど
+    return
   }
-}
 
-const resetCue = () => {
-  currentCue.value = null
-}
+  // Setup WebSocket
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  // Vercel環境では `window.location.host` にポートが含まれないが、
+  // ローカル開発環境では `localhost:3000` のようになる。
+  // FastAPIサーバーは8000番で動いているため、ホスト名を置換する必要がある。
+  const host = process.dev ? 'localhost:8000' : window.location.host
+  const wsUrl = `${wsProtocol}//${host}/ws/live`
+
+  socket = new WebSocket(wsUrl)
+
+  socket.onopen = () => {
+    console.log('WebSocket connection established')
+  }
+
+  socket.onmessage = (event) => {
+    const cueId = event.data
+    const receivedCue = cues.value.find(c => c.id === cueId)
+    if (receivedCue) {
+      currentCue.value = receivedCue
+    }
+    else {
+      console.warn(`Cue with id "${cueId}" not found.`)
+    }
+  }
+
+  socket.onclose = () => {
+    console.log('WebSocket connection closed')
+  }
+
+  socket.onerror = (error) => {
+    console.error('WebSocket error:', error)
+  }
+})
+
+onUnmounted(() => {
+  if (socket) {
+    socket.close()
+  }
+})
 </script>
 
 <style>
