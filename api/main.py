@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from redis import Redis
+from redis.exceptions import RedisError
 
 # .envファイルを読み込む (ローカル開発用)
 load_dotenv()
@@ -99,11 +100,15 @@ def read_root():
 @app.get("/api/cues", response_model=list[Cue])
 def get_cues():
     """全ての演出キューをVercel KVから取得する"""
-    cues_json = kv.get(CUES_KEY)
-    if cues_json is None:
-        return [] # データがなければ空のリストを返す
-    # JSON文字列をPythonのリストに変換して返す
-    return json.loads(cues_json)    
+    try:
+        cues_json = kv.get(CUES_KEY)
+        if cues_json is None:
+            return [] # データがなければ空のリストを返す
+        # JSON文字列をPythonのリストに変換して返す
+        return json.loads(cues_json)
+    except RedisError as e:
+        # Redis (KV) への接続エラーなどをキャッチ
+        raise HTTPException(status_code=503, detail=f"Vercel KV is unavailable: {e}")
 
 @app.post("/api/cues", response_model=Cue, status_code=201)
 def create_cue(payload: CreateCuePayload):
@@ -123,8 +128,11 @@ def create_cue(payload: CreateCuePayload):
 
     # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
     cues_to_save = [cue.model_dump() for cue in current_cues]
-    # KVに保存
-    kv.set(CUES_KEY, json.dumps(cues_to_save))
+    try:
+        # KVに保存
+        kv.set(CUES_KEY, json.dumps(cues_to_save))
+    except RedisError as e:
+        raise HTTPException(status_code=503, detail=f"Vercel KV is unavailable: {e}")
     return new_cue
 
 @app.put("/api/cues/{cue_id}", response_model=Cue)
@@ -149,8 +157,11 @@ def update_cue(cue_id: str, payload: UpdateCuePayload):
 
     # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
     cues_to_save = [cue.model_dump() for cue in cues]
-    # KVに保存
-    kv.set(CUES_KEY, json.dumps(cues_to_save))
+    try:
+        # KVに保存
+        kv.set(CUES_KEY, json.dumps(cues_to_save))
+    except RedisError as e:
+        raise HTTPException(status_code=503, detail=f"Vercel KV is unavailable: {e}")
 
     return target_cue
 
@@ -169,8 +180,11 @@ def delete_cue(cue_id: str):
 
     # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
     cues_to_save = [cue.model_dump() for cue in cues_after_delete]
-    # KVに保存
-    kv.set(CUES_KEY, json.dumps(cues_to_save))
+    try:
+        # KVに保存
+        kv.set(CUES_KEY, json.dumps(cues_to_save))
+    except RedisError as e:
+        raise HTTPException(status_code=503, detail=f"Vercel KV is unavailable: {e}")
 
     # ステータスコード204が返されるので、リターンボディは不要
     return

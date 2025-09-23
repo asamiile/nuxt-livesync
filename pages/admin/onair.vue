@@ -9,6 +9,8 @@ const { toast } = useToast()
 // --- State ---
 const { data: cues, error } = await useFetch<Cue[]>('/api/cues', {
   default: () => [],
+  // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
+  key: `onair-cues-${new Date().getTime()}`,
 })
 if (error.value) {
   toast({
