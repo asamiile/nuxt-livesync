@@ -1,9 +1,15 @@
 import os
+import uuid
+import json 
+from typing import List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import uuid # ユニークなIDを生成するためにインポート
-from typing import List
+from dotenv import load_dotenv
+from redis import Redis
+
+# .envファイルを読み込む (ローカル開発用)
+load_dotenv()
 
 # FastAPIインスタンスの作成
 app = FastAPI()
@@ -26,7 +32,6 @@ if VERCEL_URL:
     if project_name:
         allowed_origins.append(f"https://{project_name}.vercel.app")
 
-
 # CORSミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
@@ -35,6 +40,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# --- Vercel KVへの接続 ---
+REDIS_URL = os.getenv("REDIS_URL")
+if not REDIS_URL:
+    # ローカル開発などで.envがない場合に備え、エラーを発生させる
+    raise ValueError("REDIS_URL environment variable not set. Please create .env file.")
+kv = Redis.from_url(REDIS_URL)
+
+# データを保存・取得するためのキー
+CUES_KEY = "cues_list"
+
 
 # --- WebSocket接続管理 ---
 class ConnectionManager:
@@ -69,9 +86,6 @@ class CreateCuePayload(BaseModel):
     value: str
 
 
-# --- データベースの代わり (メモリ上の変数) ---
-cues_db = []
-
 # --- APIエンドポイントの定義 ---
 @app.get("/api")
 def read_root():
@@ -79,21 +93,34 @@ def read_root():
 
 @app.get("/api/cues", response_model=list[Cue])
 def get_cues():
-    """全ての演出キューを取得する"""
-    return cues_db
+    """全ての演出キューをVercel KVから取得する"""
+    cues_json = kv.get(CUES_KEY)
+    if cues_json is None:
+        return [] # データがなければ空のリストを返す
+    # JSON文字列をPythonのリストに変換して返す
+    return json.loads(cues_json)    
 
 @app.post("/api/cues", response_model=Cue, status_code=201)
 def create_cue(payload: CreateCuePayload):
-    """新しい演出キューを作成する"""
+    """新しい演出キューを作成し、Vercel KVに保存する"""
     new_cue = Cue(
         id=str(uuid.uuid4()), # ランダムなIDを生成
         name=payload.name,
         type=payload.type,
         value=payload.value
     )
-    cues_db.append(new_cue)
+    # 現在のリストをKVから取得
+    current_cues = get_cues()
+
+    # 新しいキューを追加
+    current_cues.append(new_cue)
+    # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
+    cues_to_save = [cue.model_dump() for cue in current_cues]
+    # KVに保存
+    kv.set(CUES_KEY, json.dumps(cues_to_save))
     return new_cue
 
+# --- WebSocketエンドポイント ---
 @app.websocket("/ws/live")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
