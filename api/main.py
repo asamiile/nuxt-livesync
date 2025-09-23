@@ -114,21 +114,18 @@ def create_cue(payload: CreateCuePayload):
         type=payload.type,
         value=payload.value
     )
-    # 現在のリストをKVから取得
-    current_cues = get_cues()
+    # 現在のリストをKVから取得し、Pydanticモデルのリストに変換
+    current_cues_dicts = get_cues()
+    current_cues = [Cue(**c) for c in current_cues_dicts]
 
     # 新しいキューを追加
     current_cues.append(new_cue)
+
     # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
     cues_to_save = [cue.model_dump() for cue in current_cues]
     # KVに保存
     kv.set(CUES_KEY, json.dumps(cues_to_save))
     return new_cue
-
-@app.get("/api/connections")
-def get_connections():
-    """現在のWebSocket接続数を取得する"""
-    return {"connections": len(manager.active_connections)}
 
 @app.put("/api/cues/{cue_id}", response_model=Cue)
 def update_cue(cue_id: str, payload: UpdateCuePayload):

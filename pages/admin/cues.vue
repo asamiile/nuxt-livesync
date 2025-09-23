@@ -59,10 +59,13 @@ const dialogDescription = computed(() => editingCue.value ? '演出の内容を�
 
 // 演出タイプの変更を監視し、値の初期値を設定
 watch(() => cueFormData.value.type, (newType) => {
-  if (newType === 'animation') {
-    cueFormData.value.value = ''
-  } else if (newType === 'color') {
-    cueFormData.value.value = '#000000'
+  // 新規追加時のみ、タイプの変更に応じて値を初期化する
+  if (editingCue.value === null) {
+    if (newType === 'animation') {
+      cueFormData.value.value = ''
+    } else if (newType === 'color') {
+      cueFormData.value.value = '#000000'
+    }
   }
 })
 
