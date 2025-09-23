@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth',
+})
+
 import { Film } from 'lucide-vue-next'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
