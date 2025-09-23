@@ -12,7 +12,9 @@
       v-else-if="currentCue?.type === 'animation'"
       class="flex h-full w-full items-center justify-center"
     >
-      <Vue3Lottie :animation-link="currentCue.value" height="80%" width="80%" />
+      <ClientOnly>
+        <Vue3Lottie :animation-link="currentCue.value" height="80%" width="80%" />
+      </ClientOnly>
     </div>
 
     <!-- Waiting State -->
