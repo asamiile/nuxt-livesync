@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,11 +7,29 @@ import uuid # ユニークなIDを生成するためにインポート
 # FastAPIインスタンスの作成
 app = FastAPI()
 
+# --- CORS設定 ---
+# 環境変数からVercelのURLを取得
+VERCEL_URL = os.getenv("VERCEL_URL")
+# VercelのプレビューURLと本番URL（想定）を許可リストに追加
+# 例: nuxt-livesync-lx3kfcfmg-asamiiles-projects.vercel.app
+# 例: nuxt-livesync.vercel.app
+allowed_origins = [
+    "http://localhost:3000",
+]
+
+if VERCEL_URL:
+    # VercelのプレビューデプロイメントURL
+    allowed_origins.append(f"https://{VERCEL_URL}")
+    # 本番環境のURL (プロジェクト名から生成)
+    project_name = VERCEL_URL.split('-')[0]
+    if project_name:
+        allowed_origins.append(f"https://{project_name}.vercel.app")
+
+
 # CORSミドルウェアの設定
-# Nuxtの開発サーバー (http://localhost:3000) からのリクエストを許可する
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
