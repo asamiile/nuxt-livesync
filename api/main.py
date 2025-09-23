@@ -1,8 +1,9 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uuid # ユニークなIDを生成するためにインポート
+from typing import List
 
 # FastAPIインスタンスの作成
 app = FastAPI()
@@ -34,6 +35,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- WebSocket接続管理 ---
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
 
 # --- データモデルの定義 (Pydantic) ---
 # Nuxtの types/cue.ts と対応させます
@@ -73,3 +93,22 @@ def create_cue(payload: CreateCuePayload):
     )
     cues_db.append(new_cue)
     return new_cue
+
+@app.websocket("/ws/live")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # クライアントからのメッセージを待つ場合はここで受信処理
+            # data = await websocket.receive_text()
+            # このアプリケーションではサーバーからの送信がメインなので、受信ループはシンプルに
+            await websocket.receive_text() # keep connection open
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+
+@app.post("/api/cues/trigger/{cue_id}")
+async def trigger_cue(cue_id: str):
+    """指定されたIDの演出をトリガーし、全クライアントに通知する"""
+    # 本来はここでcue_idの存在チェックなどを行う
+    await manager.broadcast(cue_id)
+    return {"message": f"Cue {cue_id} triggered"}
