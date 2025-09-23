@@ -1,0 +1,22 @@
+{
+  "builds": [
+    {
+      "src": "/api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/.vercel/outputs/static/$1"
+    }
+  ]
+}
