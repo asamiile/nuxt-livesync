@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type PropType } from 'vue'
+import { ref } from 'vue'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,18 +23,12 @@ import {
 } from '@/components/ui/table'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
-// --- Props ---
-defineProps({
-  cues: {
-    type: Array as PropType<Cue[]>,
-    default: () => [
-      { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
-      { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
-    ],
-  },
-})
-
 // --- State ---
+const cues = ref<Cue[]>([
+  { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
+  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
+])
+
 const newCue = ref<Omit<Cue, 'id'>>({
   name: '',
   type: 'color',
@@ -44,9 +38,24 @@ const newCue = ref<Omit<Cue, 'id'>>({
 const isDialogOpen = ref(false)
 
 // --- Handlers ---
-// In a real app, this would emit an event to the parent
 const handleSubmit = () => {
-  console.log('New cue submitted:', newCue.value)
+  if (!newCue.value.name || !newCue.value.value) {
+    // Basic validation
+    alert('演出名と値を入力してください。')
+    return
+  }
+
+  cues.value.push({
+    id: new Date().getTime().toString(), // Simple unique ID
+    ...newCue.value,
+  })
+
+  // Reset form and close dialog
+  newCue.value = {
+    name: '',
+    type: 'color',
+    value: '#000000',
+  }
   isDialogOpen.value = false
 }
 </script>
@@ -115,32 +124,27 @@ const handleSubmit = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-if="cues.length === 0">
-             <TableCell colspan="4" class="text-center">演出がありません。</TableCell>
+          <TableRow v-for="cue in cues" :key="cue.id">
+            <TableCell class="font-medium">{{ cue.name }}</TableCell>
+            <TableCell>{{ cue.type === 'color' ? '単色' : 'アニメーション' }}</TableCell>
+            <TableCell>
+              <template v-if="cue.type === 'color'">
+                <div class="flex items-center gap-2">
+                  <div class="h-6 w-6 rounded-full border" :style="{ backgroundColor: cue.value }"></div>
+                  <span>{{ cue.value }}</span>
+                </div>
+              </template>
+              <template v-else-if="cue.type === 'animation'">
+                <a :href="cue.value" target="_blank" class="text-blue-500 hover:underline">
+                  {{ cue.value }}
+                </a>
+              </template>
+            </TableCell>
+            <TableCell class="text-right">
+              <Button variant="outline" size="sm" class="mr-2">編集</Button>
+              <Button variant="destructive" size="sm">削除</Button>
+            </TableCell>
           </TableRow>
-          <template v-else>
-            <TableRow v-for="cue in cues" :key="cue.id">
-              <TableCell class="font-medium">{{ cue.name }}</TableCell>
-              <TableCell>{{ cue.type === 'color' ? '単色' : 'アニメーション' }}</TableCell>
-              <TableCell>
-                <template v-if="cue.type === 'color'">
-                  <div class="flex items-center gap-2">
-                    <div class="h-6 w-6 rounded-full border" :style="{ backgroundColor: cue.value }"></div>
-                    <span>{{ cue.value }}</span>
-                  </div>
-                </template>
-                <template v-else-if="cue.type === 'animation'">
-                  <a :href="cue.value" target="_blank" class="text-blue-500 hover:underline">
-                    {{ cue.value }}
-                  </a>
-                </template>
-              </TableCell>
-              <TableCell class="text-right">
-                <Button variant="outline" size="sm" class="mr-2">編集</Button>
-                <Button variant="destructive" size="sm">削除</Button>
-              </TableCell>
-            </TableRow>
-          </template>
         </TableBody>
       </Table>
     </div>

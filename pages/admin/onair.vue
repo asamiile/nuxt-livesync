@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type PropType } from 'vue'
+import { ref } from 'vue'
 import { Film } from 'lucide-vue-next'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
@@ -7,22 +7,18 @@ import { useToast } from '@/components/ui/toast/use-toast'
 
 const { toast } = useToast()
 
-// --- Props ---
-defineProps({
-  cues: {
-    type: Array as PropType<Cue[]>,
-    default: () => [
-      { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
-      { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
-      { id: '3', name: 'インターバル（青）', type: 'color', value: '#0000ff' },
-      { id: '4', name: 'エンディング（黒）', type: 'color', value: '#000000' },
-      { id: '5', name: '汎用アニメーションA', type: 'animation', value: 'https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json' },
-      { id: '6', name: '汎用アニメーションB', type: 'animation', value: 'https://assets1.lottiefiles.com/packages/lf20_u4j3xm6r.json' },
-      { id: '7', name: '背景（緑）', type: 'color', value: '#00ff00' },
-      { id: '8', name: '背景（黄）', type: 'color', value: '#ffff00' },
-    ]
-  },
-})
+// --- State ---
+// `pages/admin/cues.vue`からコピーしたダミーデータ
+const cues = ref<Cue[]>([
+  { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
+  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
+  { id: '3', name: 'インターバル（青）', type: 'color', value: '#0000ff' },
+  { id: '4', name: 'エンディング（黒）', type: 'color', value: '#000000' },
+  { id: '5', name: '汎用アニメーションA', type: 'animation', value: 'https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json' },
+  { id: '6', name: '汎用アニメーションB', type: 'animation', value: 'https://assets1.lottiefiles.com/packages/lf20_u4j3xm6r.json' },
+  { id: '7', name: '背景（緑）', type: 'color', value: '#00ff00' },
+  { id: '8', name: '背景（黄）', type: 'color', value: '#ffff00' },
+])
 
 // --- Handlers ---
 const handleButtonClick = (cue: Cue) => {

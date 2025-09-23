@@ -2,19 +2,18 @@
   <div class="relative h-screen w-screen">
     <!-- Color Display -->
     <div
-      v-if="activeCue?.type === 'color'"
+      v-if="currentCue?.type === 'color'"
       class="h-full w-full"
-      :style="{ backgroundColor: activeCue.value }"
-      data-testid="color-display"
+      :style="{ backgroundColor: currentCue.value }"
     />
 
     <!-- Lottie Animation Display -->
     <div
-      v-else-if="activeCue?.type === 'animation'"
+      v-else-if="currentCue?.type === 'animation'"
       class="flex h-full w-full items-center justify-center"
     >
       <ClientOnly>
-        <Vue3Lottie :animation-link="activeCue.value" height="80%" width="80%" />
+        <Vue3Lottie :animation-link="currentCue.value" height="80%" width="80%" />
       </ClientOnly>
     </div>
 
@@ -39,32 +38,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, type PropType } from 'vue'
+import { ref } from 'vue'
 import type { Cue } from '~/types/cue'
-import Vue3Lottie from 'vue3-lottie'
 
 // Define the layout for this page
 definePageMeta({
-  layout: false,
+  layout: false, // No layout for this page
 })
 
-const props = defineProps({
-  currentCue: {
-    type: Object as PropType<Cue | null>,
-    default: null,
-  },
-})
+const currentCue = ref<Cue | null>(null)
 
-// Internal state for demonstration purposes
-const internalCue = ref<Cue | null>(null)
-
-// The computed property that decides which cue to display.
-// It prioritizes the prop (for testing) over the internal state (for demo).
-const activeCue = computed(() => props.currentCue !== null ? props.currentCue : internalCue.value)
-
-// --- Test button logic ---
 const setRed = () => {
-  internalCue.value = {
+  currentCue.value = {
     id: 'c1',
     name: 'Red',
     type: 'color',
@@ -73,7 +58,7 @@ const setRed = () => {
 }
 
 const setAnimation = () => {
-  internalCue.value = {
+  currentCue.value = {
     id: 'c2',
     name: 'Animation',
     type: 'animation',
@@ -82,7 +67,7 @@ const setAnimation = () => {
 }
 
 const resetCue = () => {
-  internalCue.value = null
+  currentCue.value = null
 }
 </script>
 
