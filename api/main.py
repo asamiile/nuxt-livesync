@@ -128,7 +128,8 @@ def create_cue(payload: CreateCuePayload):
 @app.put("/api/cues/{cue_id}", response_model=Cue)
 def update_cue(cue_id: str, payload: UpdateCuePayload):
     """指定されたIDの演出を更新する"""
-    cues = get_cues()
+    cues_dicts = get_cues()
+    cues = [Cue(**c) for c in cues_dicts]
 
     target_cue = None
     for cue in cues:
@@ -154,7 +155,8 @@ def update_cue(cue_id: str, payload: UpdateCuePayload):
 @app.delete("/api/cues/{cue_id}", status_code=204)
 def delete_cue(cue_id: str):
     """指定されたIDの演出を削除する"""
-    cues = get_cues()
+    cues_dicts = get_cues()
+    cues = [Cue(**c) for c in cues_dicts]
 
     # 指定されたID以外のキューで新しいリストを作成
     cues_after_delete = [cue for cue in cues if cue.id != cue_id]
