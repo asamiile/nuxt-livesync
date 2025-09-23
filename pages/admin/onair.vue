@@ -13,7 +13,7 @@ defineProps({
     type: Array as PropType<Cue[]>,
     default: () => [
       { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
-      { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/8f4252de-e9e2-4d56-baa4-3adc138510c4/EiPNTtYLyF.lottie' },
+      { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
       { id: '3', name: 'インターバル（青）', type: 'color', value: '#0000ff' },
       { id: '4', name: 'エンディング（黒）', type: 'color', value: '#000000' },
       { id: '5', name: '汎用アニメーションA', type: 'animation', value: 'https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json' },
