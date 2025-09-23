@@ -3,11 +3,12 @@ import { Film } from 'lucide-vue-next'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const { toast } = useToast()
 
 // --- State ---
-const { data: cues, error } = await useFetch<Cue[]>('/api/cues', {
+const { data: cues, error, pending } = await useFetch<Cue[]>('/api/cues', {
   default: () => [],
   // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
   key: `onair-cues-${new Date().getTime()}`,
@@ -50,7 +51,15 @@ const triggerCue = async (cue: Cue) => {
       </div>
     </header>
 
-    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <!-- Loading Skeleton -->
+    <div v-if="pending" class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div v-for="n in 10" :key="n">
+        <Skeleton class="h-32 w-full" />
+      </div>
+    </div>
+
+    <!-- Cues Grid -->
+    <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       <div v-for="cue in cues" :key="cue.id">
         <Button
           variant="outline"

@@ -32,12 +32,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Skeleton } from '@/components/ui/skeleton'
 
 // --- State ---
 
 // APIからデータを取得
-const { data: cues, refresh } = await useFetch<Cue[]>('/api/cues', {
-  default: () => []
+const { data: cues, refresh, pending } = await useFetch<Cue[]>('/api/cues', {
+  default: () => [],
+  // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
+  key: `cues-list-${new Date().getTime()}`,
 })
 
 const isDialogOpen = ref(false)
@@ -214,7 +217,31 @@ const handleDelete = async (cueId: string) => {
             <TableHead class="w-[180px] text-right">操作</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody v-if="pending">
+          <TableRow v-for="n in 5" :key="n">
+            <TableCell>
+              <Skeleton class="h-5 w-3/4" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-5 w-1/2" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-5 w-full" />
+            </TableCell>
+            <TableCell class="text-right">
+              <div class="flex justify-end gap-2">
+                <Skeleton class="h-8 w-16" />
+                <Skeleton class="h-8 w-16" />
+              </div>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+        <TableBody v-else>
+          <TableRow v-if="cues && cues.length === 0">
+             <TableCell colspan="4" class="text-center text-sm text-muted-foreground">
+                演出が登録されていません。
+              </TableCell>
+          </TableRow>
           <TableRow v-for="cue in cues" :key="cue.id">
             <TableCell class="font-medium">{{ cue.name }}</TableCell>
             <TableCell>{{ cue.type === 'color' ? '単色' : 'アニメーション' }}</TableCell>
