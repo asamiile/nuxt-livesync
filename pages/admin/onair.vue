@@ -11,7 +11,7 @@ const { toast } = useToast()
 // `pages/admin/cues.vue`からコピーしたダミーデータ
 const cues = ref<Cue[]>([
   { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
-  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
+  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
   { id: '3', name: 'インターバル（青）', type: 'color', value: '#0000ff' },
   { id: '4', name: 'エンディング（黒）', type: 'color', value: '#000000' },
   { id: '5', name: '汎用アニメーションA', type: 'animation', value: 'https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json' },
