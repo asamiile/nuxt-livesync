@@ -6,10 +6,7 @@ const config: StorybookConfig = {
     "../components/**/*.stories.@(js|jsx|ts|tsx|mdx)"
   ],
   "addons": [
-    "@chromatic-com/storybook",
-    "@storybook/addon-docs",
-    "@storybook/addon-a11y",
-    "@storybook/addon-vitest"
+    "@storybook/addon-docs"
   ],
   "framework": {
     "name": "@storybook-vue/nuxt",
