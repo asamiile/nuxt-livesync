@@ -17,11 +17,6 @@
                 OnAir
               </NuxtLink>
             </li>
-            <li>
-              <NuxtLink to="/audience" class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                Audience View
-              </NuxtLink>
-            </li>
           </ul>
         </nav>
       </div>
