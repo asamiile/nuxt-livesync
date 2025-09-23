@@ -29,8 +29,8 @@ const handleLogout = async () => {
 
 <template>
   <header class="border-b">
-    <div class="container mx-auto px-4">
-      <div class="flex h-16 items-center justify-between">
+    <div class="container mx-auto p-4 sm:py-0">
+      <div class="flex flex-col sm:flex-row sm:h-16 sm:items-center sm:justify-between gap-3">
         <h1 class="text-2xl font-bold">
           <NuxtLink to="/">LiveSync Director</NuxtLink>
         </h1>
