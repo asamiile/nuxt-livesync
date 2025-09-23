@@ -12,9 +12,7 @@
       v-else-if="currentCue?.type === 'animation'"
       class="flex h-full w-full items-center justify-center"
     >
-      <ClientOnly>
-        <Vue3Lottie :animation-link="currentCue.value" height="80%" width="80%" />
-      </ClientOnly>
+      <LottiePlayer src="https://lottie.host/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json" />
     </div>
 
     <!-- Waiting State -->
@@ -62,8 +60,7 @@ const setAnimation = () => {
     id: 'c2',
     name: 'Animation',
     type: 'animation',
-    // A free Lottie animation from LottieFiles
-    value: 'https://assets9.lottiefiles.com/packages/lf20_jcikwtux.json',
+    value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json',
   }
 }
 

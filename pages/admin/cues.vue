@@ -26,7 +26,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 // --- State ---
 const cues = ref<Cue[]>([
   { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
-  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://assets10.lottiefiles.com/packages/lf20_gflb2iam.json' },
+  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
 ])
 
 const newCue = ref<Omit<Cue, 'id'>>({
