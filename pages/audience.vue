@@ -5,6 +5,7 @@
       v-if="currentCue?.type === 'color'"
       class="h-full w-full"
       :style="{ backgroundColor: currentCue.value }"
+      data-testid="color-display"
     />
 
     <!-- Lottie Animation Display -->
@@ -31,10 +32,9 @@ import Vue3Lottie from 'vue3-lottie'
 
 // Define the layout for this page
 definePageMeta({
-  layout: false, // No layout for this page
+  layout: false,
 })
 
-// This component now uses props, which I will restore from my previous refactoring
 defineProps({
   currentCue: {
     type: Object as PropType<Cue | null>,

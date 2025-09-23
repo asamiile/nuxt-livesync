@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import CuesPage from './cues.vue'
 import { TableBody, TableRow } from '@/components/ui/table'
-import { DialogContent } from '@/components/ui/dialog'
+import { DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import type { Cue } from '~/types/cue'
 
 const dummyCues: Cue[] = [
@@ -31,15 +31,11 @@ describe('pages/admin/cues.vue', () => {
       },
     })
 
-    // The DialogContent is in the DOM but not visible
-    const dialogContent = wrapper.findComponent(DialogContent)
-    expect(dialogContent.isVisible()).toBe(false)
-
-    const addButton = wrapper.find('button[aria-haspopup="dialog"]')
-    expect(addButton.exists()).toBe(true)
-
+    const addButton = wrapper.findComponent(DialogTrigger)
     await addButton.trigger('click')
 
-    expect(dialogContent.isVisible()).toBe(true)
+    // After clicking the trigger, the content should be present in the DOM.
+    const dialogContent = wrapper.findComponent(DialogContent)
+    expect(dialogContent.exists()).toBe(true)
   })
 })

@@ -24,10 +24,10 @@ describe('pages/audience.vue', () => {
       },
     })
 
-    await wrapper.vm.$nextTick() // Wait for props to cause DOM update
-
-    const colorDiv = wrapper.find('[style="background-color: rgb(255, 0, 0);"]')
+    const colorDiv = wrapper.find('[data-testid="color-display"]')
     expect(colorDiv.exists()).toBe(true)
+    // Assert the style with the correct hex code format
+    expect(colorDiv.attributes('style')).toContain('background-color: #ff0000;')
   })
 
   it('renders the Lottie component for an "animation" cue', async () => {
@@ -37,8 +37,6 @@ describe('pages/audience.vue', () => {
         currentCue: animationCue,
       },
     })
-
-    await wrapper.vm.$nextTick() // Wait for props to cause DOM update
 
     const lottieMock = wrapper.find('[data-testid="lottie-mock"]')
     expect(lottieMock.exists()).toBe(true)
