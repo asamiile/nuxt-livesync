@@ -24,10 +24,11 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 // --- State ---
-const cues = ref<Cue[]>([
-  { id: '1', name: 'オープニング（赤）', type: 'color', value: '#ff0000' },
-  { id: '2', name: 'ロゴアニメーション', type: 'animation', value: 'https://lottie.host/embed/eb085e90-8ade-428b-95b8-726a92b7be9d/0ScCF7lWrQ.json' },
-])
+// APIからデータを取得
+const { data: cues, refresh } = await useFetch<Cue[]>('/api/cues', {
+  default: () => []
+})
+
 
 const newCue = ref<Omit<Cue, 'id'>>({
   name: '',
@@ -43,25 +44,34 @@ defineExpose({
 })
 
 // --- Handlers ---
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!newCue.value.name || !newCue.value.value) {
     // Basic validation
     alert('演出名と値を入力してください。')
     return
   }
 
-  cues.value.push({
-    id: new Date().getTime().toString(), // Simple unique ID
-    ...newCue.value,
-  })
+  try {
+    await $fetch('/api/cues', {
+      method: 'POST',
+      body: newCue.value,
+    });
 
-  // Reset form and close dialog
-  newCue.value = {
-    name: '',
-    type: 'color',
-    value: '#000000',
+    // Reset form and close dialog
+    newCue.value = {
+      name: '',
+      type: 'color',
+      value: '#000000',
+    }
+    isDialogOpen.value = false
+
+    // Refresh the cue list
+    await refresh();
+
+  } catch (error) {
+    console.error('Failed to create cue:', error);
+    alert('演出の作成に失敗しました。');
   }
-  isDialogOpen.value = false
 }
 </script>
 
