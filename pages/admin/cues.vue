@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/table'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
+import LottiePlayer from '~/components/LottiePlayer.vue'
 
 // --- State ---
 
@@ -149,7 +150,7 @@ const handleDelete = async (cueId: string) => {
 </script>
 
 <template>
-  <div class="container mx-auto p-8">
+  <div>
     <header class="mb-8 flex items-center justify-between">
       <h1 class="text-3xl font-bold">演出管理</h1>
       <Dialog v-model:open="isDialogOpen">
@@ -196,8 +197,8 @@ const handleDelete = async (cueId: string) => {
             </div>
             <div v-if="cueFormData.type === 'animation'" class="grid grid-cols-4 items-center gap-4 -mt-3">
               <div class="col-start-2 col-span-3 text-sm">
-                <a href="https://lottiefiles.com/jp/blog/working-with-lottie/how-to-create-lottie-animations-from-scratch" target="_blank" class="text-blue-500 hover:underline">
-                  LottieアニメーションのJSONの作り方
+                <a href="https://lottiefiles.com/jp/" target="_blank" class="text-blue-500 hover:underline">
+                  Lottieアニメーションを作成
                 </a>
               </div>
             </div>
@@ -212,7 +213,7 @@ const handleDelete = async (cueId: string) => {
     </header>
 
     <div class="rounded-md border">
-      <Table>
+      <Table class="whitespace-nowrap">
         <TableHeader>
           <TableRow>
             <TableHead class="w-[200px]">演出名</TableHead>
@@ -257,9 +258,11 @@ const handleDelete = async (cueId: string) => {
                 </div>
               </template>
               <template v-else-if="cue.type === 'animation'">
-                <a :href="cue.value" target="_blank" class="text-blue-500 hover:underline">
-                  {{ cue.value }}
-                </a>
+                <div class="flex items-center gap-4">
+                  <a :href="cue.value" target="_blank" class="size-10">
+                    <LottiePlayer :src="cue.value" />
+                  </a>
+                </div>
               </template>
             </TableCell>
             <TableCell class="text-right">
