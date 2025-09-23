@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import TheHeader from '~/components/TheHeader.vue'
+import TheHeader from '~/components/TheHeader/TheHeader.vue'
 
 describe('TheHeader', () => {
   it('アプリ名「LiveSync Director」が正しく表示されていること', async () => {
