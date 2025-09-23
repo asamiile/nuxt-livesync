@@ -30,9 +30,14 @@
   },
   "packageManager": "pnpm@8.14.0+sha1.bb42032ff80dba5f9245bc1b03470d2fa0b7fb2f",
   "devDependencies": {
+    "@nuxt/test-utils": "^3.19.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@types/node": "^18.17.5",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^18.0.1",
+    "playwright-core": "^1.55.0",
     "shadcn-nuxt": "^2.2.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   }
 }
