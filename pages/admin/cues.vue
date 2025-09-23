@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/table'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
+import LottiePlayer from '~/components/LottiePlayer.vue'
 
 // --- State ---
 
@@ -257,9 +258,14 @@ const handleDelete = async (cueId: string) => {
                 </div>
               </template>
               <template v-else-if="cue.type === 'animation'">
-                <a :href="cue.value" target="_blank" class="text-blue-500 hover:underline">
-                  {{ cue.value }}
-                </a>
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16">
+                    <LottiePlayer :src="cue.value" />
+                  </div>
+                  <a :href="cue.value" target="_blank" class="text-blue-500 hover:underline">
+                    {{ cue.value }}
+                  </a>
+                </div>
               </template>
             </TableCell>
             <TableCell class="text-right">

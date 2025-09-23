@@ -5,6 +5,7 @@ import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import LottiePlayer from '~/components/LottiePlayer.vue'
 
 definePageMeta({
   middleware: 'auth',
@@ -19,6 +20,7 @@ const { data: cues, error, pending } = await useFetch<Cue[]>('/api/cues', {
   key: `onair-cues-${new Date().getTime()}`,
 })
 const connectionCount = ref(0)
+const triggeredCueId = ref<string | null>(null)
 let intervalId: NodeJS.Timeout | null = null
 
 // --- Lifecycle Hooks ---
@@ -71,6 +73,12 @@ const triggerCue = async (cue: Cue) => {
       title: '成功',
       description: `演出 '${cue.name}' をトリガーしました。`,
     })
+
+    // --- Visual Feedback ---
+    triggeredCueId.value = cue.id
+    setTimeout(() => {
+      triggeredCueId.value = null
+    }, 1000) // 1秒後にハイライトを解除
   }
   catch (err) {
     toast({
@@ -103,16 +111,17 @@ const triggerCue = async (cue: Cue) => {
       <div v-for="cue in cues" :key="cue.id">
         <Button
           variant="outline"
-          class="h-32 w-full flex-col items-center justify-center gap-2 p-4 text-center"
+          class="h-32 w-full flex-col items-center justify-center gap-2 p-4 text-center transition-all duration-200"
+          :class="{ 'ring-4 ring-blue-500 ring-offset-2': triggeredCueId === cue.id }"
           @click="triggerCue(cue)"
         >
-          <div class="flex h-6 w-6 items-center justify-center">
+          <div class="flex h-12 w-12 items-center justify-center">
             <div
               v-if="cue.type === 'color'"
               class="h-full w-full rounded-full border"
               :style="{ backgroundColor: cue.value }"
             ></div>
-            <Film v-else-if="cue.type === 'animation'" class="h-full w-full" />
+            <LottiePlayer v-else-if="cue.type === 'animation'" :src="cue.value" />
           </div>
           <span class="text-sm font-medium">{{ cue.name }}</span>
         </Button>
