@@ -76,9 +76,6 @@ const triggerCue = async (cue: Cue) => {
 
     // --- Visual Feedback ---
     triggeredCueId.value = cue.id
-    setTimeout(() => {
-      triggeredCueId.value = null
-    }, 1000) // 1秒後にハイライトを解除
   }
   catch (err) {
     toast({
@@ -110,9 +107,8 @@ const triggerCue = async (cue: Cue) => {
     <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       <div v-for="cue in cues" :key="cue.id">
         <Button
-          variant="outline"
+          :variant="triggeredCueId === cue.id ? 'default' : 'outline'"
           class="h-32 w-full flex-col items-center justify-center gap-2 p-4 text-center transition-all duration-200"
-          :class="{ 'ring-4 ring-blue-500 ring-offset-2': triggeredCueId === cue.id }"
           @click="triggerCue(cue)"
         >
           <div class="flex h-12 w-12 items-center justify-center">

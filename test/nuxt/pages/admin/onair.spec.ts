@@ -69,4 +69,34 @@ describe('pages/admin/onair.vue', () => {
       { method: 'POST' },
     )
   })
+
+  it('ボタンをクリックした際に、クリックされたボタンのvariantが"default"に変わり、他のボタンは"outline"のままであること', async () => {
+    const wrapper = await mountSuspended(OnAirPage)
+    // useFetchが解決し、コンポーネントが再レンダリングされるのを待つ
+    await nextTick()
+    await nextTick()
+
+    const buttons = wrapper.findAllComponents({ name: 'Button' })
+    expect(buttons.length).toBe(dummyCues.length)
+
+    // 最初のボタンをクリック
+    await buttons[0].trigger('click')
+    await nextTick()
+
+    // 最初のボタンのvariantが'default'であることを確認
+    expect(buttons[0].props('variant')).toBe('default')
+
+    // 他のボタンのvariantが'outline'であることを確認
+    for (let i = 1; i < buttons.length; i++) {
+      expect(buttons[i].props('variant')).toBe('outline')
+    }
+
+    // 2番目のボタンをクリック
+    await buttons[1].trigger('click')
+    await nextTick()
+
+    // 最初のボタンのvariantが'outline'に戻り、2番目のボタンが'default'になることを確認
+    expect(buttons[0].props('variant')).toBe('outline')
+    expect(buttons[1].props('variant')).toBe('default')
+  })
 })
