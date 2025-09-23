@@ -24,6 +24,9 @@ const fetchMock = vi.fn((url: string) => {
   if (url === '/api/cues') {
     return Promise.resolve(dummyCues)
   }
+  if (url === '/api/connections') {
+    return Promise.resolve({ connections: 10 }) // モックの接続数を返す
+  }
   return Promise.resolve({})
 })
 vi.stubGlobal('$fetch', fetchMock)
@@ -58,8 +61,8 @@ describe('pages/admin/onair.vue', () => {
     // 最初のボタンをクリック
     await firstButton.trigger('click')
 
-    // $fetchが呼ばれた回数を確認 (useFetchで1回、クリックで1回)
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    // $fetchが呼ばれた回数を確認 (useFetch, onMounted, クリックで合計3回)
+    expect(fetchMock).toHaveBeenCalledTimes(3)
     // $fetchが正しい引数で呼ばれたことを確認
     expect(fetchMock).toHaveBeenCalledWith(
       `/api/cues/trigger/${dummyCues[0].id}`,
