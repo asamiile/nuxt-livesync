@@ -1,75 +1,100 @@
-# Nuxt Minimal Starter
+# Livesync App
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Setup
+## Overview
 
-Make sure to install dependencies:
+### Technology Stack
+
+- Front-end Framework: Nuxt.js v3
+- UI Component: shadcn/vue
+- CSS Framework: Tailwind CSS v4
+- UI Catalog: Storybook
+- API: Fast API
+- Data Store: Vercel KV
+- Test: Vitest
+- Deploy: Vercel
+
+
+### demo
+
+- [Livesync App]()
+- [Stoyrbook]()
+
+## Getting Started
+
+### Nuxt
+
+- Make sure to install dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+- Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+- Build the application for production:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
 pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+- Locally preview production build:
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
 pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### Fast API 
+
+- Navigate to the API directory:
+
+```bash
+cd api
+```
+
+- Create and activate a Python virtual environment:
+
+```bash
+# Create venv
+python3 -m venv venv
+
+# Activate venv (macOS/Linux)
+source venv/bin/activate
+```
+
+- Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+- Start the development server on http://127.0.0.1:8000:
+
+```bash
+uvicorn main:app --reload
+```
+- View interactive API documentation (Swagger UI) on http://127.0.0.1:8000/docs:
+
+Once the server is running, you can access the auto-generated API documentation in your browser to view and test the endpoints.
+
+
+### Storybook
+
+- Launch the Storybook Viewer on `http://localhost:6006`:
+
+```bash
+pnpm run storybook
+```
+
+
+### Vitest
+
+- Run Unit and Component Test
+
+```bash
+pnpm run test
+```
