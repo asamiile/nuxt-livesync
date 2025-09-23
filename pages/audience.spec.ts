@@ -3,12 +3,16 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import AudiencePage from './audience.vue'
 import type { Cue } from '~/types/cue'
 
-vi.mock('vue3-lottie', () => ({
-    default: {
-        name: 'Vue3Lottie',
-        template: '<div data-testid="lottie-mock">Lottie Mock</div>'
+// Mock the vue3-lottie that is now imported directly by audience.vue
+// This mock prevents the real library from running and crashing the test env.
+vi.mock('vue3-lottie', () => {
+    return {
+        default: {
+            name: 'Vue3Lottie',
+            template: '<div data-testid="lottie-mock">Lottie Mock</div>'
+        }
     }
-}))
+})
 
 describe('pages/audience.vue', () => {
   it('renders waiting state when no cue is provided', async () => {
@@ -26,7 +30,6 @@ describe('pages/audience.vue', () => {
 
     const colorDiv = wrapper.find('[data-testid="color-display"]')
     expect(colorDiv.exists()).toBe(true)
-    // Assert the style with the correct hex code format
     expect(colorDiv.attributes('style')).toContain('background-color: #ff0000;')
   })
 
