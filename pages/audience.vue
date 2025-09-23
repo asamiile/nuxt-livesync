@@ -63,7 +63,7 @@ const setAnimation = () => {
     name: 'Animation',
     type: 'animation',
     // A free Lottie animation from LottieFiles
-    value: 'https://lottie.host/85bf29d8-948b-4977-a4b8-936696956690/32uSPkM32J.json',
+    value: 'https://assets9.lottiefiles.com/packages/lf20_jcikwtux.json',
   }
 }
 
