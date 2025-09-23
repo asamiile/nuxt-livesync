@@ -5,8 +5,8 @@
       "use": "@vercel/python"
     },
     {
-      "src": "nuxt.config.ts",
-      "use": "@vercel/node"
+      "src": "package.json",
+      "use": "@vercel/nuxt"
     }
   ]
 }
