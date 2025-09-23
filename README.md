@@ -17,7 +17,7 @@
 
 ### demo
 
-- [Livesync App]()
+- [Livesync App](https://nuxt-livesync.vercel.app)
 - [Stoyrbook]()
 
 ## Getting Started
