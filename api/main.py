@@ -2,7 +2,7 @@ import os
 import uuid
 import json 
 from typing import List
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -85,6 +85,11 @@ class CreateCuePayload(BaseModel):
     type: str
     value: str
 
+class UpdateCuePayload(BaseModel):
+    name: str
+    type: str
+    value: str
+
 
 # --- APIエンドポイントの定義 ---
 @app.get("/api")
@@ -119,6 +124,53 @@ def create_cue(payload: CreateCuePayload):
     # KVに保存
     kv.set(CUES_KEY, json.dumps(cues_to_save))
     return new_cue
+
+@app.put("/api/cues/{cue_id}", response_model=Cue)
+def update_cue(cue_id: str, payload: UpdateCuePayload):
+    """指定されたIDの演出を更新する"""
+    cues = get_cues()
+
+    target_cue = None
+    for cue in cues:
+        if cue.id == cue_id:
+            target_cue = cue
+            break
+
+    if not target_cue:
+        raise HTTPException(status_code=404, detail="Cue not found")
+
+    # データを更新
+    target_cue.name = payload.name
+    target_cue.type = payload.type
+    target_cue.value = payload.value
+
+    # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
+    cues_to_save = [cue.model_dump() for cue in cues]
+    # KVに保存
+    kv.set(CUES_KEY, json.dumps(cues_to_save))
+
+    return target_cue
+
+@app.delete("/api/cues/{cue_id}", status_code=204)
+def delete_cue(cue_id: str):
+    """指定されたIDの演出を削除する"""
+    cues = get_cues()
+
+    # 指定されたID以外のキューで新しいリストを作成
+    cues_after_delete = [cue for cue in cues if cue.id != cue_id]
+
+    # 削除対象が見つからなかった場合（リストの長さが変わらない）
+    if len(cues) == len(cues_after_delete):
+        raise HTTPException(status_code=404, detail="Cue not found")
+
+    # Pydanticモデルのリストを辞書のリストに変換してからJSON文字列にする
+    cues_to_save = [cue.model_dump() for cue in cues_after_delete]
+    # KVに保存
+    kv.set(CUES_KEY, json.dumps(cues_to_save))
+
+    # ステータスコード204が返されるので、リターンボディは不要
+    return
+
 
 # --- WebSocketエンドポイント ---
 @app.websocket("/ws/live")
