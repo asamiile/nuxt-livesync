@@ -5,7 +5,6 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/tailwindcss",
     "shadcn-nuxt",
-    "@nuxtjs/storybook",
   ],
   css: ['@/assets/css/tailwind.css'],
   shadcn: {
