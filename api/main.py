@@ -190,6 +190,12 @@ def delete_cue(cue_id: str):
     return
 
 
+@app.get("/api/connections")
+def get_connections():
+    """現在のWebSocket接続数を取得する"""
+    return {"connections": len(manager.active_connections)}
+
+
 # --- WebSocketエンドポイント ---
 @app.websocket("/ws/live")
 async def websocket_endpoint(websocket: WebSocket):
