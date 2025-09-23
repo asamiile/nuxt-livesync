@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import OnAirPage from './onair.vue'
+import OnAirPage from '~/pages/admin/onair.vue'
 import type { Cue } from '~/types/cue'
 import { nextTick } from 'vue'
 

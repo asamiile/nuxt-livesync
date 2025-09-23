@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import AudiencePage from './audience.vue'
+import AudiencePage from '~/pages/audience.vue'
 import LottiePlayer from '~/components/LottiePlayer.vue'
 
 // Lottieコンポーネントのモック化

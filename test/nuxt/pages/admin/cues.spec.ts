@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import CuesPage from './cues.vue'
+import CuesPage from '~/pages/admin/cues.vue'
 import type { Cue } from '~/types/cue'
 import { nextTick } from 'vue'
 
