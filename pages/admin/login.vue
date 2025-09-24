@@ -43,10 +43,10 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
-    <div class="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+  <div class="flex items-center justify-center">
+    <div class="w-full max-w-md space-y-8 rounded-lg bg-card text-card-foreground p-8 shadow-md">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+        <h2 class="mt-6 text-center text-3xl font-extrabold">
           管理者ログイン
         </h2>
       </div>
@@ -60,7 +60,7 @@ const handleLogin = async () => {
               name="password"
               type="password"
               required
-              class="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 sm:text-sm"
+              class="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
               placeholder="パスワード"
             />
           </div>
@@ -69,8 +69,9 @@ const handleLogin = async () => {
         <div>
           <Button
             type="submit"
-            class="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            class="w-full"
             :disabled="isLoading"
+            variant="default"
           >
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             {{ isLoading ? 'ログイン中...' : 'ログイン' }}
