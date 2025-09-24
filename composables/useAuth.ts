@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { useState } from '#app'
 
 export const useAuth = () => {
   const authToken = useCookie<string | null>('auth_token', {
@@ -8,7 +8,7 @@ export const useAuth = () => {
     maxAge: 60 * 60 * 8, // 8 hours
   })
 
-  const isAuthenticated = ref(false)
+  const isAuthenticated = useState('isAuthenticated', () => false)
 
   // ログイン処理
   const login = async (password: string) => {
@@ -65,11 +65,18 @@ export const useAuth = () => {
           'Authorization': `Bearer ${authToken.value}`,
         },
       })
+
       isAuthenticated.value = authenticated
+      // レスポンスが false の場合、トークンは無効なのでクリアする
+      if (!authenticated) {
+        authToken.value = null
+      }
       return authenticated
     } catch (error) {
       console.error('Token verification failed:', error)
       isAuthenticated.value = false
+      // エラー時もトークンをクリアする
+      authToken.value = null
       return false
     }
   }
