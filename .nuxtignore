@@ -1,2 +1,0 @@
-# Ignore the server/api directory to prevent conflicts with the FastAPI proxy
-server/api
