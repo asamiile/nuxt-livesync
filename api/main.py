@@ -76,8 +76,8 @@ manager = ConnectionManager()
 
 
 # --- データモデルの定義 (Pydantic) ---
-from api.models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
-from api.models.auth_models import LoginPayload
+from models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
+from models.auth_models import LoginPayload
 
 
 # --- APIエンドポイントの定義 ---
