@@ -60,10 +60,20 @@ export const useAuth = () => {
     }
 
     try {
+      const headers: Record<string, string> = {
+        'Authorization': `Bearer ${authToken.value}`,
+      }
+
+      // サーバーサイドでのみ、リクエストからCookieヘッダーを取得して転送する
+      if (process.server) {
+        const requestHeaders = useRequestHeaders(['cookie'])
+        if (requestHeaders.cookie) {
+          headers.cookie = requestHeaders.cookie
+        }
+      }
+
       const { authenticated } = await $fetch<{ authenticated: boolean }>('/api/verify', {
-        headers: {
-          'Authorization': `Bearer ${authToken.value}`,
-        },
+        headers,
       })
 
       isAuthenticated.value = authenticated
