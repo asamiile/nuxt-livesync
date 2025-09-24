@@ -58,6 +58,23 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: uvicorn api.main:app --host 0.0.0.0 --port 8000 &
 
+      - name: Wait for API Server
+        run: |
+          echo "Waiting for API server to be ready..."
+          for i in {1..20}; do
+            if curl -s http://127.0.0.1:8000/api/health; then
+              echo "API server is ready."
+              break
+            fi
+            echo "Attempt $i: API server not ready yet. Retrying in 3 seconds..."
+            sleep 3
+          done
+          # Final check
+          if ! curl -s http://127.0.0.1:8000/api/health; then
+            echo "API server did not start in time."
+            exit 1
+          fi
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 

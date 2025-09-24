@@ -168,6 +168,11 @@ def logout(authorization: Annotated[str | None, Header()] = None):
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/api/health")
+def health_check():
+    """ヘルスチェック用エンドポイント"""
+    return {"status": "ok"}
+
 @app.get("/api/cues", response_model=list[Cue])
 def get_cues():
     """全ての演出キューをVercel KVから取得する"""
