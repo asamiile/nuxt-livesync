@@ -4,102 +4,73 @@ import secrets
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, Header
+from fastapi import APIRouter, HTTPException, Response, Header
 from redis import Redis
 from redis.exceptions import RedisError
 
-from ..models.auth_models import LoginPayload
-from ..dependencies.database import get_kv
+from dependencies.database import kv
+from models.auth_models import LoginPayload
 
-router = APIRouter(
-    prefix="/api",
-    tags=["Authentication"]
-)
+router = APIRouter()
 
-@router.post("/login")
-def login(
-    payload: LoginPayload,
-    response: Response,
-    kv: Redis = Depends(get_kv)
-):
-    """
-    Log in as an administrator and issue a session token.
-    """
+@router.post("/api/login")
+def login(payload: LoginPayload, response: Response):
+    """管理者としてログインし、セッショントークンを発行する"""
     master_password = os.getenv("ADMIN_PASSWORD")
     if master_password is None:
-        raise HTTPException(
-            status_code=500,
-            detail="ADMIN_PASSWORD is not set on the server"
-        )
+        raise HTTPException(status_code=500, detail="ADMIN_PASSWORD is not set on the server")
 
     if payload.password != master_password:
         raise HTTPException(status_code=401, detail="Incorrect password")
 
+    # 安全なセッショントークンを生成
     session_token = secrets.token_hex(32)
 
     try:
-        # Store session information in Vercel KV (expires in 8 hours)
-        kv.set(
-            f"session:{session_token}",
-            json.dumps({"session": "active"}),
-            ex=timedelta(hours=8)
-        )
+        # Vercel KVにセッション情報を保存（有効期限8時間）
+        kv.set(f"session:{session_token}", json.dumps({ "session": "active" }), ex=timedelta(hours=8))
     except RedisError as e:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Vercel KV is unavailable: {e}"
-        )
+        raise HTTPException(status_code=503, detail=f"Vercel KV is unavailable: {e}")
 
+    # トークンをJSONで返す
     return {"token": session_token}
 
-@router.get("/verify")
-def verify(
-    authorization: Annotated[str | None, Header()] = None,
-    kv: Redis = Depends(get_kv)
-):
-    """
-    Verify if the provided token is valid.
-    """
+@router.get("/api/verify")
+def verify(authorization: Annotated[str | None, Header()] = None):
+    """提供されたトークンが有効か検証する"""
     if authorization is None:
         return {"authenticated": False}
 
-    try:
-        scheme, token = authorization.split()
-        if scheme.lower() != "bearer" or not token:
-            return {"authenticated": False}
-    except ValueError:
-        return {"authenticated": False}
+    # "Bearer "プレフィックスを削除
+    token = authorization.split(" ")[-1]
 
     try:
+        # Vercel KVにトークンが存在するか確認
         session_data = kv.get(f"session:{token}")
-        return {"authenticated": bool(session_data)}
+        if session_data:
+            return {"authenticated": True}
+        else:
+            return {"authenticated": False}
     except RedisError:
-        # Treat KV unavailability as not authenticated
+        # KVが利用できない場合も非認証として扱う
         return {"authenticated": False}
 
-@router.post("/logout", status_code=204)
-def logout(
-    authorization: Annotated[str | None, Header()] = None,
-    kv: Redis = Depends(get_kv)
-):
-    """
-    End the session (invalidate the token).
-    """
+@router.post("/api/logout", status_code=204)
+def logout(authorization: Annotated[str | None, Header()] = None):
+    """セッションを終了（トークンを無効化）する"""
     if authorization is None:
+        # トークンがなくてもエラーにはせず、正常終了とする
         return
 
+    token = authorization.split(" ")[-1]
     try:
-        scheme, token = authorization.split()
-        if scheme.lower() == "bearer" and token:
-            kv.delete(f"session:{token}")
-    except ValueError:
-        # Ignore malformed headers
-        pass
+        # Vercel KVからセッショントークンを削除
+        kv.delete(f"session:{token}")
     except RedisError as e:
-        # If a KV error occurs, we should still let the client proceed
-        # as if logout was successful.
+        # KVエラーが発生しても、クライアント側はログアウト成功とみなせるようにする
+        # ここでエラーを投げると、クライアントがCookieを削除できなくなる可能性がある
         print(f"Could not delete session from Vercel KV: {e}")
-        pass
+        pass # エラーを無視
 
-    # Always return 204 No Content
+    # 成功時は 204 No Content を返す
     return

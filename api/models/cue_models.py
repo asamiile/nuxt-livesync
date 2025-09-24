@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-# Nuxtの types/cue.ts と対応
 class Cue(BaseModel):
     id: str
     name: str

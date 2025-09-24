@@ -1,45 +1,41 @@
 import os
-from fastapi import FastAPI
+import uuid
+import json
+import secrets
+from datetime import timedelta
+from typing import List, Annotated
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Response, Header
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from dotenv import load_dotenv
+from redis import Redis
+from redis.exceptions import RedisError
 
-# Routers
-from .routers import auth, cues, websocket
-
-# Load .env file (for local development)
+# .envファイルを読み込む (ローカル開発用)
 load_dotenv()
 
-app = FastAPI(
-    title="Nuxt LiveSync API",
-    description="API for real-time synchronization of stage effects.",
-    version="1.0.0"
-)
+# FastAPIインスタンスの作成
+app = FastAPI()
 
-# --- CORS Configuration ---
+# --- CORS設定 ---
+# 環境変数からVercelのURLを取得
 VERCEL_URL = os.getenv("VERCEL_URL")
+# VercelのプレビューURLと本番URL（想定）を許可リストに追加
+# 例: nuxt-livesync-lx3kfcfmg-asamiiles-projects.vercel.app
+# 例: nuxt-livesync.vercel.app
 allowed_origins = [
     "http://localhost:3000",
 ]
 
 if VERCEL_URL:
-    # Vercel preview deployment URL
-    # e.g., "nuxt-livesync-abc-123.vercel.app"
+    # VercelのプレビューデプロイメントURL
     allowed_origins.append(f"https://{VERCEL_URL}")
-    # Also add the potential production URL
-    # e.g., "nuxt-livesync.vercel.app"
-    try:
-        # Assumes format like "project-name-random-hash-scope.vercel.app"
-        # or "project-name-git-branch-scope.vercel.app"
-        parts = VERCEL_URL.split('-')
-        if len(parts) > 1:
-            project_name = parts[0]
-            prod_domain = f"https://{project_name}.vercel.app"
-            if prod_domain not in allowed_origins:
-                allowed_origins.append(prod_domain)
-    except Exception as e:
-        print(f"Could not parse VERCEL_URL to determine production domain: {e}")
+    # 本番環境のURL (プロジェクト名から生成)
+    project_name = VERCEL_URL.split('-')[0]
+    if project_name:
+        allowed_origins.append(f"https://{project_name}.vercel.app")
 
-
+# CORSミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -48,13 +44,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Include Routers ---
+
+# --- Vercel KVへの接続 ---
+from dependencies.database import kv, CUES_KEY
+
+
+# --- WebSocket接続管理 ---
+from websocket.manager import manager
+
+
+# --- データモデルの定義 (Pydantic) ---
+from models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
+from models.auth_models import LoginPayload
+
+
+# --- APIエンドポイントの定義 ---
+from routers import auth, cues, websocket
+
 app.include_router(auth.router)
 app.include_router(cues.router)
 app.include_router(websocket.router)
 
-# --- Root Endpoint ---
+# Add a root endpoint for health checks
 @app.get("/api")
 def read_root():
-    """A simple endpoint to confirm the API is running."""
     return {"status": "ok", "message": "Welcome to the Nuxt LiveSync API"}
