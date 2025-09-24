@@ -1,11 +1,11 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-[#3C3C3C]">
+  <div class="flex flex-col min-h-screen">
     <TheHeader />
     <main class="flex-grow container mx-auto px-5 py-10 sm:py-20">
       <slot />
     </main>
-    <footer class="py-4 bg-[#3C3C3C]">
-      <div class="container mx-auto px-4 text-center text-secondary">
+    <footer class="py-4 bg-gray-100">
+      <div class="container mx-auto px-4 text-center text-gray-500">
         &copy; {{ currentYear }} Your Company Name.
       </div>
     </footer>

@@ -17,7 +17,7 @@
 
     <!-- Waiting State -->
     <div v-else class="flex h-full w-full items-center justify-center bg-gray-800 text-white">
-      <h1 class="text-4xl font-bold">Waiting...</h1>
+      <h1 class="text-4xl font-bold">待機中...</h1>
     </div>
   </div>
 </template>
@@ -91,4 +91,10 @@ onUnmounted(() => {
 </script>
 
 <style>
+/* Ensure the page takes the full viewport without scrollbars */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 </style>

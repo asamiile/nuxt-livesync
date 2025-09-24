@@ -16,6 +16,6 @@ vi.stubGlobal('WebSocket', vi.fn(() => ({
 describe('index', () => {
   it('renders a waiting message by default', async () => {
     const wrapper = await mountSuspended(index)
-    expect(wrapper.text()).toContain('Waiting...')
+    expect(wrapper.text()).toContain('待機中...')
   })
 })
