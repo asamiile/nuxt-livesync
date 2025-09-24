@@ -7,6 +7,12 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "@nuxtjs/storybook",
   ],
+  components: [
+    {
+      path: '~/components',
+      extensions: ['.vue'],
+    },
+  ],
   css: ['@/assets/css/tailwind.css'],
   shadcn: {
     /**
