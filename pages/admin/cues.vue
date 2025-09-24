@@ -55,7 +55,7 @@ const editingCue = ref<Cue | null>(null)
 const cueFormData = ref<Omit<Cue, 'id'>>({
   name: '',
   type: 'color',
-  value: '#000000',
+  value: '',
 })
 
 // ダイアログのタイトルを動的に変更
@@ -72,7 +72,7 @@ watch(() => cueFormData.value.type, (newType) => {
     if (newType === 'animation') {
       cueFormData.value.value = ''
     } else if (newType === 'color') {
-      cueFormData.value.value = '#000000'
+      cueFormData.value.value = ''
     }
   }
 })
@@ -86,7 +86,7 @@ const handleAddNewClick = () => {
   cueFormData.value = {
     name: '',
     type: 'color',
-    value: '#000000',
+    value: '',
   }
   isDialogOpen.value = true
 }
@@ -167,7 +167,7 @@ const handleDelete = async (cueId: string) => {
               <Label for="name" class="text-right">
                 演出名
               </Label>
-              <Input id="name" v-model="cueFormData.name" class="col-span-3" />
+              <Input id="name" v-model="cueFormData.name" placeholder="演出の名前を入力" class="col-span-3" />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
               <Label class="text-right">
@@ -192,12 +192,12 @@ const handleDelete = async (cueId: string) => {
                 id="value"
                 v-model="cueFormData.value"
                 class="col-span-3"
-                :placeholder="cueFormData.type === 'animation' ? 'lottieのURL' : ''"
+                :placeholder="cueFormData.type === 'animation' ? 'LottieのURLを入力' : '#000など色の値を入力'"
               />
             </div>
             <div v-if="cueFormData.type === 'animation'" class="grid grid-cols-4 items-center gap-4 -mt-3">
               <div class="col-start-2 col-span-3 text-sm">
-                <a href="https://lottiefiles.com/jp/" target="_blank" class="text-blue-500 hover:underline">
+                <a href="https://lottiefiles.com/jp/" target="_blank" class="text-blue-400 hover:underline">
                   Lottieアニメーションを作成
                 </a>
               </div>
