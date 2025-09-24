@@ -12,6 +12,6 @@ test('Homepage', async ({ page, goto }) => {
     }
   })
 
-  // The page should display "待機中..." initially.
-  await expect(page.getByRole('heading', { name: '待機中...' })).toBeVisible()
+  // The page should display "Waiting..." initially.
+  await expect(page.getByRole('heading', { name: 'Waiting...' })).toBeVisible()
 })
