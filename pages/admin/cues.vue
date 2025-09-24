@@ -5,7 +5,7 @@ definePageMeta({
 
 import { ref, computed, watch } from 'vue'
 import type { Cue } from '~/types/cue'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -280,7 +280,7 @@ const handleDelete = async (cueId: string) => {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>キャンセル</AlertDialogCancel>
-                    <AlertDialogAction @click="handleDelete(cue.id)">はい、削除します</AlertDialogAction>
+                    <AlertDialogAction :class="buttonVariants({ variant: 'destructive' })" @click="handleDelete(cue.id)">はい、削除します</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
