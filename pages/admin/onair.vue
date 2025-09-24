@@ -89,7 +89,7 @@ const triggerCue = async (cue: Cue) => {
 
 <template>
   <div>
-    <header class="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <header class="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-secondary">
       <h1 class="text-3xl font-bold">ライブ本番操作</h1>
       <div class="text-lg font-semibold">
         現在の接続人数: {{ connectionCount }}

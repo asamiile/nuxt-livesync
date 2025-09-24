@@ -46,7 +46,7 @@ const handleLogin = async () => {
   <div class="flex items-center justify-center">
     <div class="w-full max-w-md space-y-8 rounded-lg bg-card text-card-foreground p-8 shadow-md">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-6 text-center text-3xl font-extrabold">
           管理者ログイン
         </h2>
       </div>

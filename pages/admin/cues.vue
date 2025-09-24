@@ -151,7 +151,7 @@ const handleDelete = async (cueId: string) => {
 
 <template>
   <div>
-    <header class="mb-8 flex items-center justify-between">
+    <header class="mb-8 flex items-center justify-between text-secondary">
       <h1 class="text-3xl font-bold">演出管理</h1>
       <Dialog v-model:open="isDialogOpen">
         <Button @click="handleAddNewClick">新規演出を追加</Button>
@@ -212,8 +212,8 @@ const handleDelete = async (cueId: string) => {
       </Dialog>
     </header>
 
-    <div class="rounded-md border">
-      <Table class="whitespace-nowrap bg-card text-card-foreground rounded-lg shadow-md">
+    <div class="bg-card text-card-foreground rounded-lg shadow-md border">
+      <Table class="whitespace-nowrap">
         <TableHeader>
           <TableRow>
             <TableHead class="w-[200px]">演出名</TableHead>
