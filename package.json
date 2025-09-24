@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "test:e2e": "pnpm exec nuxt prepare && playwright test",
+    "test:e2e": "bash test-e2e.sh",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -43,6 +43,7 @@
     "shadcn-nuxt": "^2.2.0",
     "storybook": "^9.1.7",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wait-on": "^9.0.1"
   }
 }

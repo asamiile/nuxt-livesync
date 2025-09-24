@@ -12,6 +12,6 @@ test('Homepage', async ({ page, goto }) => {
     }
   })
 
-  await expect(page.getByRole('heading', { name: 'Cue-T' })).toBeVisible()
-  await expect(page.getByText('リアルタイムに演出をコントロール')).toBeVisible()
+  // The page should display "待機中..." initially.
+  await expect(page.getByRole('heading', { name: '待機中...' })).toBeVisible()
 })

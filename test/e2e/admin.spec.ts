@@ -1,7 +1,11 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
 test.describe('Admin Section', () => {
-  const adminPassword = process.env.ADMIN_PASSWORD || 'KxBHkw.f94t!'
+  const adminPassword = process.env.ADMIN_PASSWORD
+
+  if (!adminPassword) {
+    throw new Error('ADMIN_PASSWORD environment variable is not set')
+  }
   const nuxtConfig = {
     public: {
       apiBase: 'http://127.0.0.1:8000/api'

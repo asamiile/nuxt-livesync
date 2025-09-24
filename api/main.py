@@ -168,7 +168,7 @@ def logout(authorization: Annotated[str | None, Header()] = None):
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 def health_check():
     """ヘルスチェック用エンドポイント"""
     return {"status": "ok"}
