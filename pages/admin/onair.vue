@@ -71,7 +71,7 @@ const triggerCue = async (cue: Cue) => {
     })
     toast({
       title: '成功',
-      description: `演出 '${cue.name}' をトリガーしました。`,
+      description: `演出 ${cue.name} を実行しました。`,
     })
 
     // --- Visual Feedback ---
@@ -80,7 +80,7 @@ const triggerCue = async (cue: Cue) => {
   catch (err) {
     toast({
       title: 'エラー',
-      description: '演出のトリガーに失敗しました。',
+      description: '演出の実行に失敗しました。',
       variant: 'destructive',
     })
   }
@@ -89,7 +89,7 @@ const triggerCue = async (cue: Cue) => {
 
 <template>
   <div>
-    <header class="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <header class="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-secondary">
       <h1 class="text-3xl font-bold">ライブ本番操作</h1>
       <div class="text-lg font-semibold">
         現在の接続人数: {{ connectionCount }}
@@ -97,14 +97,14 @@ const triggerCue = async (cue: Cue) => {
     </header>
 
     <!-- Loading Skeleton -->
-    <div v-if="pending" class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div v-if="pending" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="n in 10" :key="n">
         <Skeleton class="h-32 w-full" />
       </div>
     </div>
 
     <!-- Cues Grid -->
-    <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="cue in cues" :key="cue.id">
         <Button
           :variant="triggeredCueId === cue.id ? 'default' : 'outline'"

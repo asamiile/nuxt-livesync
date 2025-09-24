@@ -5,7 +5,7 @@ definePageMeta({
 
 import { ref, computed, watch } from 'vue'
 import type { Cue } from '~/types/cue'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -55,7 +55,7 @@ const editingCue = ref<Cue | null>(null)
 const cueFormData = ref<Omit<Cue, 'id'>>({
   name: '',
   type: 'color',
-  value: '#000000',
+  value: '',
 })
 
 // ダイアログのタイトルを動的に変更
@@ -72,7 +72,7 @@ watch(() => cueFormData.value.type, (newType) => {
     if (newType === 'animation') {
       cueFormData.value.value = ''
     } else if (newType === 'color') {
-      cueFormData.value.value = '#000000'
+      cueFormData.value.value = ''
     }
   }
 })
@@ -86,7 +86,7 @@ const handleAddNewClick = () => {
   cueFormData.value = {
     name: '',
     type: 'color',
-    value: '#000000',
+    value: '',
   }
   isDialogOpen.value = true
 }
@@ -151,7 +151,7 @@ const handleDelete = async (cueId: string) => {
 
 <template>
   <div>
-    <header class="mb-8 flex items-center justify-between">
+    <header class="mb-8 flex items-center justify-between text-secondary">
       <h1 class="text-3xl font-bold">演出管理</h1>
       <Dialog v-model:open="isDialogOpen">
         <Button @click="handleAddNewClick">新規演出を追加</Button>
@@ -167,7 +167,7 @@ const handleDelete = async (cueId: string) => {
               <Label for="name" class="text-right">
                 演出名
               </Label>
-              <Input id="name" v-model="cueFormData.name" class="col-span-3" />
+              <Input id="name" v-model="cueFormData.name" placeholder="演出の名前を入力" class="col-span-3" />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
               <Label class="text-right">
@@ -192,12 +192,12 @@ const handleDelete = async (cueId: string) => {
                 id="value"
                 v-model="cueFormData.value"
                 class="col-span-3"
-                :placeholder="cueFormData.type === 'animation' ? 'lottieのURL' : ''"
+                :placeholder="cueFormData.type === 'animation' ? 'LottieのURLを入力' : '#000など色の値を入力'"
               />
             </div>
             <div v-if="cueFormData.type === 'animation'" class="grid grid-cols-4 items-center gap-4 -mt-3">
               <div class="col-start-2 col-span-3 text-sm">
-                <a href="https://lottiefiles.com/jp/" target="_blank" class="text-blue-500 hover:underline">
+                <a href="https://lottiefiles.com/jp/" target="_blank" class="text-blue-400 hover:underline">
                   Lottieアニメーションを作成
                 </a>
               </div>
@@ -212,7 +212,7 @@ const handleDelete = async (cueId: string) => {
       </Dialog>
     </header>
 
-    <div class="rounded-md border">
+    <div class="bg-card text-card-foreground rounded-lg shadow-md border">
       <Table class="whitespace-nowrap">
         <TableHeader>
           <TableRow>
@@ -243,7 +243,7 @@ const handleDelete = async (cueId: string) => {
         </TableBody>
         <TableBody v-else>
           <TableRow v-if="cues && cues.length === 0">
-             <TableCell colspan="4" class="text-center text-sm text-muted-foreground">
+            <TableCell colspan="4" class="text-center text-sm text-muted-foreground">
                 演出が登録されていません。
               </TableCell>
           </TableRow>
@@ -266,7 +266,7 @@ const handleDelete = async (cueId: string) => {
               </template>
             </TableCell>
             <TableCell class="text-right">
-               <Button variant="outline" size="sm" class="mr-2" @click="handleEditClick(cue)">編集</Button>
+              <Button variant="outline" size="sm" class="mr-2" @click="handleEditClick(cue)">編集</Button>
               <AlertDialog>
                 <AlertDialogTrigger as-child>
                   <Button variant="destructive" size="sm">削除</Button>
@@ -280,7 +280,7 @@ const handleDelete = async (cueId: string) => {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>キャンセル</AlertDialogCancel>
-                    <AlertDialogAction @click="handleDelete(cue.id)">はい、削除します</AlertDialogAction>
+                    <AlertDialogAction :class="buttonVariants({ variant: 'destructive' })" @click="handleDelete(cue.id)">はい、削除します</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
