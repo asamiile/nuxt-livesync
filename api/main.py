@@ -1,13 +1,16 @@
 import os
+from dotenv import load_dotenv
+
+# Load .env file before any other application imports
+# This is crucial to ensure environment variables are available when other modules are imported.
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
+
 
 # Routers
 from routers import auth, cues, websocket
-
-# Load .env file (for local development)
-load_dotenv()
 
 app = FastAPI(
     title="Nuxt LiveSync API",
