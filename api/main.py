@@ -46,14 +46,7 @@ app.add_middleware(
 
 
 # --- Vercel KVへの接続 ---
-REDIS_URL = os.getenv("REDIS_URL")
-if not REDIS_URL:
-    # ローカル開発などで.envがない場合に備え、エラーを発生させる
-    raise ValueError("REDIS_URL environment variable not set. Please create .env file.")
-kv = Redis.from_url(REDIS_URL)
-
-# データを保存・取得するためのキー
-CUES_KEY = "cues_list"
+from dependencies.database import kv, CUES_KEY
 
 
 # --- WebSocket接続管理 ---
