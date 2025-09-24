@@ -97,14 +97,14 @@ const triggerCue = async (cue: Cue) => {
     </header>
 
     <!-- Loading Skeleton -->
-    <div v-if="pending" class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div v-if="pending" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="n in 10" :key="n">
         <Skeleton class="h-32 w-full" />
       </div>
     </div>
 
     <!-- Cues Grid -->
-    <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="cue in cues" :key="cue.id">
         <Button
           :variant="triggeredCueId === cue.id ? 'default' : 'outline'"
