@@ -213,7 +213,7 @@ const handleDelete = async (cueId: string) => {
     </header>
 
     <div class="rounded-md border">
-      <Table class="whitespace-nowrap">
+      <Table class="whitespace-nowrap bg-card text-card-foreground rounded-lg shadow-md">
         <TableHeader>
           <TableRow>
             <TableHead class="w-[200px]">演出名</TableHead>
@@ -243,7 +243,7 @@ const handleDelete = async (cueId: string) => {
         </TableBody>
         <TableBody v-else>
           <TableRow v-if="cues && cues.length === 0">
-             <TableCell colspan="4" class="text-center text-sm text-muted-foreground">
+            <TableCell colspan="4" class="text-center text-sm text-muted-foreground">
                 演出が登録されていません。
               </TableCell>
           </TableRow>
@@ -266,7 +266,7 @@ const handleDelete = async (cueId: string) => {
               </template>
             </TableCell>
             <TableCell class="text-right">
-               <Button variant="outline" size="sm" class="mr-2" @click="handleEditClick(cue)">編集</Button>
+              <Button variant="outline" size="sm" class="mr-2" @click="handleEditClick(cue)">編集</Button>
               <AlertDialog>
                 <AlertDialogTrigger as-child>
                   <Button variant="destructive" size="sm">削除</Button>

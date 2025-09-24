@@ -71,7 +71,7 @@ const triggerCue = async (cue: Cue) => {
     })
     toast({
       title: '成功',
-      description: `演出 '${cue.name}' をトリガーしました。`,
+      description: `演出 ${cue.name} を実行しました。`,
     })
 
     // --- Visual Feedback ---
@@ -80,7 +80,7 @@ const triggerCue = async (cue: Cue) => {
   catch (err) {
     toast({
       title: 'エラー',
-      description: '演出のトリガーに失敗しました。',
+      description: '演出の実行に失敗しました。',
       variant: 'destructive',
     })
   }
