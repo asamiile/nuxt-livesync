@@ -1,6 +1,9 @@
 import { ref } from 'vue'
 
 export const useAuth = () => {
+  const config = useRuntimeConfig()
+  const apiBase = config.public.apiBase
+
   const authToken = useCookie<string | null>('auth_token', {
     // secure: process.env.NODE_ENV === 'production', // 本番環境でのみtrue
     httpOnly: false, // クライアント側で読み書きするためfalse
@@ -12,7 +15,7 @@ export const useAuth = () => {
 
   // ログイン処理
   const login = async (password: string) => {
-    const { data, error } = await useFetch<{ token: string }>('/api/login', {
+    const { data, error } = await useFetch<{ token: string }>(`${apiBase}/login`, {
       method: 'POST',
       body: { password },
     })
@@ -33,7 +36,7 @@ export const useAuth = () => {
     if (!authToken.value) return
 
     try {
-      await $fetch('/api/logout', {
+      await $fetch(`${apiBase}/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken.value}`,
@@ -60,7 +63,7 @@ export const useAuth = () => {
     }
 
     try {
-      const { authenticated } = await $fetch<{ authenticated: boolean }>('/api/verify', {
+      const { authenticated } = await $fetch<{ authenticated: boolean }>(`${apiBase}/verify`, {
         headers: {
           'Authorization': `Bearer ${authToken.value}`,
         },

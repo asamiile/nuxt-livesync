@@ -35,3 +35,7 @@ __pycache__/
 
 # Vercel
 .vercel
+
+# Test results
+test-results/
+api.log

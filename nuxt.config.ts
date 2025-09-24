@@ -20,6 +20,12 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
 
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
+    }
+  },
+
   // --- Local development proxy ---
   // https://nuxt.com/docs/getting-started/deployment#proxy-server-and-api-routes
   vite: {
@@ -33,4 +39,5 @@ export default defineNuxtConfig({
       },
     },
   },
+
 })
