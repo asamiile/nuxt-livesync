@@ -99,7 +99,7 @@ const triggerCue = async (cue: Cue) => {
     <!-- Loading Skeleton -->
     <div v-if="pending" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="n in 10" :key="n">
-        <Skeleton class="h-32 w-full" />
+        <Skeleton class="h-[12.5rem] w-full" />
       </div>
     </div>
 
@@ -108,10 +108,10 @@ const triggerCue = async (cue: Cue) => {
       <div v-for="cue in cues" :key="cue.id">
         <Button
           :variant="triggeredCueId === cue.id ? 'default' : 'outline'"
-          class="h-32 w-full flex-col items-center justify-center gap-2 p-4 text-center transition-all duration-200"
+          class="h-40 md:h-48 w-full flex-col items-center justify-center gap-4 p-4 text-center transition-all duration-200"
           @click="triggerCue(cue)"
         >
-          <div class="flex h-12 w-12 items-center justify-center">
+          <div class="flex size-14 md:size-20 items-center justify-center">
             <div
               v-if="cue.type === 'color'"
               class="h-full w-full rounded-full border"
@@ -119,7 +119,7 @@ const triggerCue = async (cue: Cue) => {
             ></div>
             <LottiePlayer v-else-if="cue.type === 'animation'" :src="cue.value" />
           </div>
-          <span class="text-sm font-medium">{{ cue.name }}</span>
+          <span class="text-base font-medium">{{ cue.name }}</span>
         </Button>
       </div>
     </div>
