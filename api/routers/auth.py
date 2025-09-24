@@ -8,8 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response, Header
 from redis import Redis
 from redis.exceptions import RedisError
 
-from ..models.auth_models import LoginPayload
-from ..dependencies.database import get_kv
+from models.auth_models import LoginPayload
+from dependencies.database import get_kv
 
 router = APIRouter(
     prefix="/api",

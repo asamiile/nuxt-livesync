@@ -3,7 +3,7 @@ from fastapi import Header, HTTPException, Depends
 from redis import Redis
 from redis.exceptions import RedisError
 
-from .database import get_kv
+from database import get_kv
 
 
 def get_current_session(

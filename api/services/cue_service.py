@@ -5,7 +5,7 @@ from redis import Redis
 from redis.exceptions import RedisError
 from fastapi import HTTPException
 
-from ..models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
+from models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
 
 CUES_KEY = "cues_list"
 

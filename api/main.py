@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 # Routers
-from .routers import auth, cues, websocket
+from routers import auth, cues, websocket
 
 # Load .env file (for local development)
 load_dotenv()

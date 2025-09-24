@@ -2,11 +2,11 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from redis import Redis
 
-from ..services import cue_service
-from ..models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
-from ..dependencies.database import get_kv
-from ..dependencies.auth import get_current_session
-from ..websocket.manager import manager
+from services import cue_service
+from models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
+from dependencies.database import get_kv
+from dependencies.auth import get_current_session
+from websocket.manager import manager
 
 router = APIRouter(
     prefix="/api/cues",
