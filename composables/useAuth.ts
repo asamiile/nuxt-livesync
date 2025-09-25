@@ -10,27 +10,25 @@ export const useAuth = () => {
 
   const isAuthenticated = useState('isAuthenticated', () => false)
 
-  const { $apiFetch } = useNuxtApp()
-
   // ログイン処理
   const login = async (password: string) => {
-    // useFetch は useAsyncData + $fetch のラッパーなので、ここでは $apiFetch を直接使う
-    const { data, error } = await useAsyncData<{ token: string }>(
-      'login',
-      () => $apiFetch('/api/login', {
+    try {
+      const data = await useApiFetch<{ token: string }>('/login', {
         method: 'POST',
         body: { password },
       })
-    )
 
-    if (error.value) {
-      console.error('Login failed:', error.value)
+      if (data?.token) {
+        authToken.value = data.token
+        isAuthenticated.value = true
+      } else {
+        throw new Error('Login did not return a token.')
+      }
+    } catch (error) {
+      console.error('Login failed:', error)
+      isAuthenticated.value = false
+      authToken.value = null
       throw new Error('Login failed')
-    }
-
-    if (data.value?.token) {
-      authToken.value = data.value.token
-      isAuthenticated.value = true
     }
   }
 
@@ -39,11 +37,9 @@ export const useAuth = () => {
     if (!authToken.value) return
 
     try {
-      await $apiFetch('/api/logout', {
+      // useApiFetchが自動でヘッダーを付与する
+      await useApiFetch('/logout', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${authToken.value}`,
-        },
       })
     } catch (error) {
         // サーバー側でエラーが発生しても、クライアント側ではログアウト処理を続行する
@@ -66,21 +62,8 @@ export const useAuth = () => {
     }
 
     try {
-      const headers: Record<string, string> = {
-        'Authorization': `Bearer ${authToken.value}`,
-      }
-
-      // サーバーサイドでのみ、リクエストからCookieヘッダーを取得して転送する
-      if (process.server) {
-        const requestHeaders = useRequestHeaders(['cookie'])
-        if (requestHeaders.cookie) {
-          headers.cookie = requestHeaders.cookie
-        }
-      }
-
-      const { authenticated } = await $apiFetch<{ authenticated: boolean }>('/api/verify', {
-        headers,
-      })
+      // useApiFetchが自動でヘッダーを付与する
+      const { authenticated } = await useApiFetch<{ authenticated: boolean }>('/verify')
 
       isAuthenticated.value = authenticated
       // レスポンスが false の場合、トークンは無効なのでクリアする

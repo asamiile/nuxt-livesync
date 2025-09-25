@@ -36,11 +36,9 @@ const currentCue = ref<Cue | null>(null)
 let socket: WebSocket | null = null
 
 onMounted(async () => {
-  const { $apiFetch } = useNuxtApp()
-
   // Fetch all cues
   try {
-    const fetchedCues = await $apiFetch<Cue[]>('/api/cues')
+    const fetchedCues = await useApiFetch<Cue[]>('/cues')
     cues.value = fetchedCues
   }
   catch (error) {
@@ -51,17 +49,17 @@ onMounted(async () => {
 
   // Setup WebSocket
   const config = useRuntimeConfig()
-  const apiBaseUrl = config.public.apiBaseUrl || ''
+  const apiUrl = config.public.apiUrl
 
   let wsUrl: string
-  if (apiBaseUrl) {
-    // Vercel環境: 環境変数からWebSocket URLを構築
-    // https://your-app.vercel.app -> wss://your-app.vercel.app
-    wsUrl = apiBaseUrl.replace(/^http/, 'ws') + '/ws/live'
+  // Vercel環境（本番URLが設定されている）かローカル環境かを判定
+  if (apiUrl.includes('vercel.app')) {
+    // Vercel環境: 公開URLからWebSocket URLを構築
+    wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws/live'
   } else {
-    // ローカル環境: プロキシ経由で接続
+    // ローカル環境: 現在のホストからWebSocket URLを構築し、プロキシを利用
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const host = window.location.host // localhost:3000
+    const host = window.location.host // e.g., localhost:3000
     wsUrl = `${wsProtocol}//${host}/ws/live`
   }
 

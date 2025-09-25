@@ -32,7 +32,10 @@ export default defineNuxtConfig({
   // https://nuxt.com/docs/guide/going-further/runtime-config
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '',
-    },
+      // Vercelの環境変数をクライアントサイドに公開する
+      apiUrl: process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:3000',
+    }
   },
 })

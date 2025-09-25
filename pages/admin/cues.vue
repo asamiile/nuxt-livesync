@@ -38,11 +38,14 @@ import LottiePlayer from '~/components/LottiePlayer.vue'
 // --- State ---
 
 // APIからデータを取得
-const { data: cues, refresh, pending } = await useFetch<Cue[]>('/api/cues', {
-  default: () => [],
+const { data: cues, refresh, pending } = await useAsyncData<Cue[]>(
   // サーバーとクライアントでキーを一致させるため、静的なキーを使用
-  key: 'cues-list',
-})
+  'cues-list',
+  () => useApiFetch<Cue[]>('/cues'),
+  {
+    default: () => [],
+  }
+)
 
 const isDialogOpen = ref(false)
 const editingCue = ref<Cue | null>(null)
@@ -109,13 +112,13 @@ const handleSubmit = async () => {
   try {
     if (editingCue.value) {
       // 編集モード
-      await $fetch(`/api/cues/${editingCue.value.id}`, {
+      await useApiFetch(`/cues/${editingCue.value.id}`, {
         method: 'PUT',
         body: cueFormData.value,
       })
     } else {
       // 新規追加モード
-      await $fetch('/api/cues', {
+      await useApiFetch('/cues', {
         method: 'POST',
         body: cueFormData.value,
       })
@@ -133,7 +136,7 @@ const handleSubmit = async () => {
 // 削除処理
 const handleDelete = async (cueId: string) => {
   try {
-    await $fetch(`/api/cues/${cueId}`, {
+    await useApiFetch(`/cues/${cueId}`, {
       method: 'DELETE',
     })
     await refresh() // テーブルを更新

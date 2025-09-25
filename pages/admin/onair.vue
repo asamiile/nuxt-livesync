@@ -10,11 +10,14 @@ import LottiePlayer from '~/components/LottiePlayer.vue'
 const { toast } = useToast()
 
 // --- State ---
-const { data: cues, error, pending } = await useFetch<Cue[]>('/api/cues', {
-  default: () => [],
+const { data: cues, error, pending } = await useAsyncData<Cue[]>(
   // サーバーとクライアントでキーを一致させるため、静的なキーを使用
-  key: 'onair-cues',
-})
+  'onair-cues',
+  () => useApiFetch<Cue[]>('/cues'),
+  {
+    default: () => [],
+  }
+)
 const connectionCount = ref(0)
 const triggeredCueId = ref<string | null>(null)
 let intervalId: NodeJS.Timeout | null = null
@@ -45,7 +48,7 @@ if (error.value) {
 // --- Methods ---
 async function fetchConnectionCount() {
   try {
-    const data = await $fetch<{ connections: number }>('/api/connections')
+    const data = await useApiFetch<{ connections: number }>('/connections')
     connectionCount.value = data.connections
   }
   catch (err) {
@@ -62,7 +65,7 @@ async function fetchConnectionCount() {
 // --- Handlers ---
 const triggerCue = async (cue: Cue) => {
   try {
-    await $fetch(`/api/cues/trigger/${cue.id}`, {
+    await useApiFetch(`/cues/trigger/${cue.id}`, {
       method: 'POST',
     })
     toast({
