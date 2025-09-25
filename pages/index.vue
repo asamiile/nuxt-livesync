@@ -36,11 +36,11 @@ const currentCue = ref<Cue | null>(null)
 let socket: WebSocket | null = null
 
 onMounted(async () => {
+  const { httpUrl, wsUrl } = useApi()
+
   // Fetch all cues
   try {
-    const fetchedCues = await $fetch<Cue[]>('/api/cues', {
-      // baseURLはNuxtのプロキシ設定に任せる
-    })
+    const fetchedCues = await $fetch<Cue[]>(`${httpUrl.value}/api/cues`)
     cues.value = fetchedCues
   }
   catch (error) {
@@ -50,14 +50,7 @@ onMounted(async () => {
   }
 
   // Setup WebSocket
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  // Vercel環境では `window.location.host` にポートが含まれないが、
-  // ローカル開発環境では `localhost:3000` のようになる。
-  // FastAPIサーバーは8000番で動いているため、ホスト名を置換する必要がある。
-  const host = process.dev ? 'localhost:8000' : window.location.host
-  const wsUrl = `${wsProtocol}//${host}/ws/live`
-
-  socket = new WebSocket(wsUrl)
+  socket = new WebSocket(`${wsUrl.value}/ws/live`)
 
   socket.onopen = () => {
     console.log('WebSocket connection established')

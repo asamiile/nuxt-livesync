@@ -10,9 +10,11 @@ export const useAuth = () => {
 
   const isAuthenticated = useState('isAuthenticated', () => false)
 
+  const { httpUrl } = useApi()
+
   // ログイン処理
   const login = async (password: string) => {
-    const { data, error } = await useFetch<{ token: string }>('/api/login', {
+    const { data, error } = await useFetch<{ token: string }>(`${httpUrl.value}/api/login`, {
       method: 'POST',
       body: { password },
     })
@@ -33,7 +35,7 @@ export const useAuth = () => {
     if (!authToken.value) return
 
     try {
-      await $fetch('/api/logout', {
+      await $fetch(`${httpUrl.value}/api/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken.value}`,
@@ -72,7 +74,7 @@ export const useAuth = () => {
         }
       }
 
-      const { authenticated } = await $fetch<{ authenticated: boolean }>('/api/verify', {
+      const { authenticated } = await $fetch<{ authenticated: boolean }>(`${httpUrl.value}/api/verify`, {
         headers,
       })
 
