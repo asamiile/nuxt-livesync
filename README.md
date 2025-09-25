@@ -82,6 +82,36 @@ uvicorn main:app --reload
 Once the server is running, you can access the auto-generated API documentation in your browser to view and test the endpoints.
 
 
+### Supabase
+
+#### Migration
+
+- initial setup
+
+```bash
+supabase login
+supabase link --project-ref [project-ref]
+```
+
+- Applying the migration file
+
+```bash
+supabase db push
+```
+
+- Viewing Migration History
+
+```bash
+supabase migration list
+```
+
+- Repairing migration history
+
+```bash
+supabase migration repair [TIMESTAMP] --status applied
+```
+
+
 ### Storybook
 
 - Launch the Storybook Viewer on `http://localhost:6006`:
