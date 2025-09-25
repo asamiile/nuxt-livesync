@@ -20,15 +20,8 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
 
-  components: [
-    {
-      path: '~/components/ui',
-      // The prefix is defined in `shadcn.prefix`
-      prefix: '',
-      ignore: ['**/index.ts'],
-    },
-    '~/components',
-  ],
+  routeRules: {},
+
 
   // --- Local development proxy ---
   // https://nuxt.com/docs/getting-started/deployment#proxy-server-and-api-routes
