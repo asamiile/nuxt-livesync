@@ -5,11 +5,18 @@
         <h1 class="mt-6 text-center text-3xl font-extrabold">{{ error.statusCode }}</h1>
         <div>
           <p class="text-xl mb-8">{{ message }}</p>
-          <NuxtLink to="/">
-            <Button>
-              Go back home
-            </Button>
-          </NuxtLink>
+          <div class="flex items-center justify-center gap-4">
+            <NuxtLink to="/">
+              <Button>
+                Go back audience
+              </Button>
+            </NuxtLink>
+            <NuxtLink to="/admin/login">
+              <Button>
+                Go back admin
+              </Button>
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
