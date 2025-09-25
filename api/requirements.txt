@@ -1,6 +1,0 @@
-# Test comment to check if overwrite works
-fastapi
-uvicorn
-websockets
-python-dotenv
-redis>=4.0.0,<5.0.0
