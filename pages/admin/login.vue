@@ -30,11 +30,11 @@ const handleLogin = async () => {
     await login(email.value, password.value)
     // ログイン成功後、目的のページにリダイレクト
     await navigateTo('/admin/cues')
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
     toast({
       title: 'ログイン失敗',
-      description: 'メールアドレスまたはパスワードが正しくありません。',
+      description: error.message || '不明なエラーが発生しました。',
       variant: 'destructive',
     })
   } finally {
