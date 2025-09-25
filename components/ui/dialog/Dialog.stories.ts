@@ -13,10 +13,23 @@ import { Input } from '../input'
 import { Label } from '../label'
 
 const meta = {
-  title: 'Component/Dialog',
+  title: 'UI/Dialog',
   component: Dialog,
-  tags: ['autodocs'],
-  render: (args: any) => ({
+  subcomponents: {
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  },
+} satisfies Meta<typeof Dialog>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default = {
+  render: args => ({
     components: {
       Dialog,
       DialogContent,
@@ -29,9 +42,12 @@ const meta = {
       Input,
       Label,
     },
+    setup() {
+      return { args }
+    },
     template: `
-      <Dialog>
-        <DialogTrigger as-child>
+      <Dialog v-bind="args">
+        <DialogTrigger>
           <Button variant="outline">
             Edit Profile
           </Button>
@@ -66,11 +82,5 @@ const meta = {
       </Dialog>
     `,
   }),
-} satisfies Meta<typeof Dialog>
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
   args: {},
-}
+} satisfies Story

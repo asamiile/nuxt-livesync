@@ -10,10 +10,38 @@ import {
 } from '.'
 
 const meta = {
-  title: 'Component/Table',
+  title: 'UI/Table',
   component: Table,
-  tags: ['autodocs'],
-  render: (args: any) => ({
+  subcomponents: {
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+  },
+} satisfies Meta<typeof Table>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+const invoices = [
+  {
+    invoice: 'INV001',
+    paymentStatus: 'Paid',
+    totalAmount: '$250.00',
+    paymentMethod: 'Credit Card',
+  },
+  {
+    invoice: 'INV002',
+    paymentStatus: 'Pending',
+    totalAmount: '$150.00',
+    paymentMethod: 'PayPal',
+  },
+]
+
+export const Default = {
+  render: args => ({
     components: {
       Table,
       TableBody,
@@ -23,8 +51,11 @@ const meta = {
       TableHeader,
       TableRow,
     },
+    setup() {
+      return { ...args, invoices }
+    },
     template: `
-      <Table>
+      <Table v-bind="args">
         <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
           <TableRow>
@@ -39,25 +70,19 @@ const meta = {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
+          <TableRow v-for="invoice in invoices" :key="invoice.invoice">
             <TableCell class="font-medium">
-              INV001
+              {{ invoice.invoice }}
             </TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
+            <TableCell>{{ invoice.paymentStatus }}</TableCell>
+            <TableCell>{{ invoice.paymentMethod }}</TableCell>
             <TableCell class="text-right">
-              $250.00
+              {{ invoice.totalAmount }}
             </TableCell>
           </TableRow>
         </TableBody>
       </Table>
     `,
   }),
-} satisfies Meta<typeof Table>
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
   args: {},
-}
+} satisfies Story

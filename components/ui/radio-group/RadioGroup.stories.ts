@@ -3,13 +3,22 @@ import { RadioGroup, RadioGroupItem } from '.'
 import { Label } from '../label'
 
 const meta = {
-  title: 'Component/RadioGroup',
+  title: 'UI/RadioGroup',
   component: RadioGroup,
-  tags: ['autodocs'],
-  render: (args: any) => ({
+  subcomponents: { RadioGroupItem },
+} satisfies Meta<typeof RadioGroup>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default = {
+  render: args => ({
     components: { RadioGroup, RadioGroupItem, Label },
+    setup() {
+      return { args }
+    },
     template: `
-      <RadioGroup default-value="comfortable">
+      <RadioGroup v-bind="args">
         <div class="flex items-center space-x-2">
           <RadioGroupItem id="r1" value="default" />
           <Label for="r1">Default</Label>
@@ -25,11 +34,7 @@ const meta = {
       </RadioGroup>
     `,
   }),
-} satisfies Meta<typeof RadioGroup>
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
-  args: {},
-}
+  args: {
+    defaultValue: 'comfortable',
+  },
+} satisfies Story
