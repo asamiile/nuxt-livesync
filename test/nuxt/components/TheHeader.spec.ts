@@ -1,22 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { reactive, nextTick } from 'vue'
+import { nextTick } from 'vue'
 import TheHeader from '~/components/TheHeader/TheHeader.vue'
+import { useSupabaseUser, useSupabaseClient } from '#imports'
 
-const { useAuth } = await import('~/composables/useAuth')
-const { isAuthenticated, logout } = useAuth()
-
-const mockRoute = reactive({ path: '/admin/cues' })
-vi.mock('vue-router', async () => {
-  const actual = await vi.importActual('vue-router')
-  return { ...actual, useRoute: () => mockRoute }
-})
+const mockRoute = { path: '/' }
+vi.mock('vue-router', () => ({
+  useRoute: () => mockRoute,
+}))
 
 describe('TheHeader', () => {
+  const user = useSupabaseUser()
+  const client = useSupabaseClient()
+
   beforeEach(() => {
-    isAuthenticated.value = false
-    mockRoute.path = '/admin/cues'
     vi.clearAllMocks()
+    user.value = null
+    mockRoute.path = '/admin/cues'
   })
 
   it('アプリ名「LiveSync Director」が正しく表示されていること', async () => {
@@ -31,26 +31,25 @@ describe('TheHeader', () => {
     })
 
     it('認証状態では、管理者用ナビゲーションとログアウトボタンが表示されること', async () => {
-      isAuthenticated.value = true
-      await nextTick()
-
+      user.value = { id: 'user-123', email: 'test@example.com' }
       const wrapper = await mountSuspended(TheHeader)
-      expect(wrapper.vm.isAuthenticated.value).toBe(true)
+      await nextTick()
 
       const nav = wrapper.find('nav')
       expect(nav.exists()).toBe(true)
 
-      const logoutButton = wrapper.find('button', { text: 'ログアウト' })
+      const logoutButton = wrapper.find('button')
+      expect(logoutButton.text()).toBe('ログアウト')
       await logoutButton.trigger('click')
-      expect(logout).toHaveBeenCalledTimes(1)
+      expect(client.auth.signOut).toHaveBeenCalledTimes(1)
     })
 
     it('/admin/login ページでは、認証済みでもナビゲーションが表示されないこと', async () => {
-      isAuthenticated.value = true
+      user.value = { id: 'user-123', email: 'test@example.com' }
       mockRoute.path = '/admin/login'
+      const wrapper = await mountSuspended(TheHeader)
       await nextTick()
 
-      const wrapper = await mountSuspended(TheHeader)
       expect(wrapper.find('nav').exists()).toBe(false)
     })
   })

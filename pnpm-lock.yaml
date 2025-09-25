@@ -67,6 +67,9 @@ devDependencies:
   '@vue/test-utils':
     specifier: ^2.4.6
     version: 2.4.6
+  dotenv:
+    specifier: ^17.2.2
+    version: 17.2.2
   happy-dom:
     specifier: ^18.0.1
     version: 18.0.1

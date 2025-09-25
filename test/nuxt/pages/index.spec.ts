@@ -3,33 +3,39 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import IndexPage from '~/pages/index.vue'
 import LottiePlayer from '~/components/LottiePlayer.vue'
 import { nextTick } from 'vue'
+import type { Cue } from '~/types/cue'
 
-const dummyCues = [
-  { id: 'c1', name: 'Cue 1', type: 'color', value: '#ff0000' },
-  { id: 'c2', name: 'Cue 2', type: 'animation', value: 'http://example.com/anim.json' },
-]
-
-// Supabase Clientのモックを取得
-const { createBrowserClient } = await import('@supabase/ssr')
-const mockSupabaseClient = createBrowserClient('', '')
-const mockChannel = {
-  on: vi.fn().mockReturnThis(),
-  subscribe: vi.fn((callback) => {
-    // モックのコールバックを保存して後で呼び出せるようにする
-    (mockChannel as any)._triggerCallback = callback
+// --- Mocks ---
+let triggerCallback: (payload: any) => void
+const mockSubscription = {
+  on: vi.fn((event, filter, callback) => {
+    triggerCallback = callback
+    return mockSubscription
   }),
+  subscribe: vi.fn(() => mockSubscription),
 }
-mockSupabaseClient.channel = vi.fn().mockReturnValue(mockChannel)
+const mockSelect = vi.fn()
+const mockSupabase = {
+  from: () => ({
+    select: mockSelect,
+  }),
+  channel: () => mockSubscription,
+}
+
+vi.mock('#imports', () => ({
+  useSupabaseClient: () => mockSupabase,
+}))
+// --- End Mocks ---
+
+const dummyCues: Cue[] = [
+  { id: 'c1', name: 'Cue 1', type: 'color', value: '#ff0000', created_at: new Date().toISOString() },
+  { id: 'c2', name: 'Cue 2', type: 'animation', value: 'http://example.com/anim.json', created_at: new Date().toISOString() },
+]
 
 describe('pages/index.vue', () => {
   beforeEach(() => {
-    // モックのデータを設定
-    mockSupabaseClient.from.mockImplementation((tableName) => {
-      if (tableName === 'cues') {
-        return { select: vi.fn().mockResolvedValue({ data: dummyCues, error: null }) }
-      }
-      return {}
-    })
+    vi.clearAllMocks()
+    mockSelect.mockResolvedValue({ data: [...dummyCues], error: null })
   })
 
   it('デフォルトで待機メッセージが表示されること', async () => {
@@ -40,13 +46,9 @@ describe('pages/index.vue', () => {
   it('Supabase Realtimeで受け取ったcueに応じて背景色が変わること', async () => {
     const wrapper = await mountSuspended(IndexPage)
     await nextTick()
-
-    // リアルタイムイベントをシミュレート
     const payload = { new: { active_cue_id: 'c1' } }
-    const handler = (mockChannel.on as any).mock.calls[0][2] // .onの3番目の引数はハンドラ
-    handler(payload)
+    triggerCallback(payload)
     await nextTick()
-
     const colorDiv = wrapper.find('.h-full.w-full')
     expect(colorDiv.exists()).toBe(true)
     expect(colorDiv.attributes('style')).toContain(`background-color: ${dummyCues[0].value}`)
@@ -55,14 +57,24 @@ describe('pages/index.vue', () => {
   it('Supabase Realtimeで受け取ったcueに応じてLottieアニメーションが表示されること', async () => {
     const wrapper = await mountSuspended(IndexPage)
     await nextTick()
-
     const payload = { new: { active_cue_id: 'c2' } }
-    const handler = (mockChannel.on as any).mock.calls[0][2]
-    handler(payload)
+    triggerCallback(payload)
     await nextTick()
-
     const lottiePlayer = wrapper.findComponent(LottiePlayer)
     expect(lottiePlayer.exists()).toBe(true)
     expect(lottiePlayer.props('src')).toBe(dummyCues[1].value)
+  })
+
+  it('active_cue_idがnullの場合、待機メッセージが表示されること', async () => {
+    const wrapper = await mountSuspended(IndexPage)
+    await nextTick()
+    triggerCallback({ new: { active_cue_id: 'c1' } })
+    await nextTick()
+    expect(wrapper.find('.h-full.w-full').exists()).toBe(true)
+    triggerCallback({ new: { active_cue_id: null } })
+    await nextTick()
+    expect(wrapper.text()).toContain('Waiting...')
+    expect(wrapper.findComponent(LottiePlayer).exists()).toBe(false)
+    expect(wrapper.find('.h-full.w-full').exists()).toBe(false)
   })
 })

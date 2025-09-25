@@ -1,61 +1,52 @@
 import { vi, beforeEach } from 'vitest'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import { useSupabaseUser, useSupabaseClient } from '#imports'
 
-const mockSupabaseClient = {
-  from: vi.fn().mockReturnThis(),
-  select: vi.fn().mockReturnThis(),
-  order: vi.fn().mockResolvedValue({ data: [], error: null }),
-  eq: vi.fn().mockReturnThis(),
-  update: vi.fn().mockResolvedValue({ error: null }),
-  insert: vi.fn().mockResolvedValue({ error: null }),
-  delete: vi.fn().mockResolvedValue({ error: null }),
-  channel: vi.fn(() => ({
-    on: vi.fn().mockReturnThis(),
-    subscribe: vi.fn(),
-    unsubscribe: vi.fn(),
-  })),
-  removeChannel: vi.fn(),
-  auth: {
-    onAuthStateChange: vi.fn((callback) => {
-      // The callback is expected to be a function.
-      if (typeof callback === 'function') {
-        callback('INITIAL_SESSION', null)
-      }
-      return {
-        data: { subscription: { unsubscribe: vi.fn() } },
-      }
-    }),
-  },
-}
+// happy-domに存在しない`alert`をモック
+window.alert = vi.fn()
 
-vi.mock('@supabase/ssr', () => ({
-  createBrowserClient: vi.fn(() => mockSupabaseClient),
-}))
-
-const mockUser = { id: 'user-123', email: 'test@example.com' }
-const isAuthenticated = ref(false)
-
-vi.mock('~/composables/useAuth', () => ({
-  useAuth: () => ({
-    user: computed(() => (isAuthenticated.value ? mockUser : null)),
-    isAuthenticated,
-    login: vi.fn(),
-    logout: vi.fn(),
-  }),
-}))
-
+// beforeEachフックで各テストの前にモックをリセット
 beforeEach(() => {
-  isAuthenticated.value = false
   vi.clearAllMocks()
-  mockSupabaseClient.from.mockReturnThis()
-  mockSupabaseClient.select.mockReturnThis()
-  mockSupabaseClient.order.mockResolvedValue({ data: [], error: null })
-  mockSupabaseClient.auth.onAuthStateChange.mockImplementation((callback) => {
-    if (typeof callback === 'function') {
-      callback('INITIAL_SESSION', null)
-    }
-    return {
-      data: { subscription: { unsubscribe: vi.fn() } },
-    }
-  })
+
+  // --- Mocks ---
+  ;(useSupabaseUser as any).mockReturnValue(ref(null))
+
+  const queryBuilderMock = {
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockResolvedValue({ error: null }),
+    update: vi.fn().mockResolvedValue({ error: null }),
+    delete: vi.fn().mockResolvedValue({ error: null }),
+    eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockResolvedValue({ data: [], error: null }),
+  }
+
+  const realtimeChannelMock = {
+    on: vi.fn(function (this: any, event, filter, callback) {
+      this.callback = callback
+      return this
+    }),
+    subscribe: vi.fn(function (this: any, cb) {
+      this._trigger = (payload: any) => {
+        if (this.callback) {
+          this.callback(payload)
+        }
+      }
+      if (cb) {
+        cb('SUBSCRIBED')
+      }
+      return this
+    }),
+  }
+
+  const clientMock = {
+    from: vi.fn(() => queryBuilderMock),
+    channel: vi.fn(() => realtimeChannelMock),
+    auth: {
+      signInWithPassword: vi.fn().mockResolvedValue({ data: { user: {} }, error: null }),
+      signOut: vi.fn().mockResolvedValue({ error: null }),
+    },
+  }
+
+  ;(useSupabaseClient as any).mockReturnValue(clientMock)
 })
