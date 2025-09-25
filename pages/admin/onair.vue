@@ -7,10 +7,6 @@ import { useToast } from '@/components/ui/toast/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import LottiePlayer from '~/components/LottiePlayer.vue'
 
-definePageMeta({
-  middleware: 'auth',
-})
-
 const { toast } = useToast()
 
 // --- State ---
