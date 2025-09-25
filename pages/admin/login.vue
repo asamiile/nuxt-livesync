@@ -9,15 +9,16 @@ import { useToast } from '@/components/ui/toast/use-toast'
 const { login } = useAuth()
 const { toast } = useToast()
 
+const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
 
 // ログイン処理
 const handleLogin = async () => {
-  if (!password.value) {
+  if (!email.value || !password.value) {
     toast({
       title: 'エラー',
-      description: 'パスワードを入力してください。',
+      description: 'メールアドレスとパスワードを入力してください。',
       variant: 'destructive',
     })
     return
@@ -26,14 +27,14 @@ const handleLogin = async () => {
   isLoading.value = true
   try {
     // useAuthのlogin関数を呼び出す
-    await login(password.value)
+    await login(email.value, password.value)
     // ログイン成功後、目的のページにリダイレクト
     await navigateTo('/admin/cues')
   } catch (error) {
     console.error(error)
     toast({
       title: 'ログイン失敗',
-      description: 'パスワードが正しくありません。',
+      description: 'メールアドレスまたはパスワードが正しくありません。',
       variant: 'destructive',
     })
   } finally {
@@ -51,9 +52,22 @@ const handleLogin = async () => {
         </h2>
       </div>
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-        <div class="rounded-md shadow-sm -space-y-px">
+        <div class="rounded-md shadow-sm space-y-4">
           <div>
-            <Label for="password" class="sr-only">パスワード</Label>
+            <Label for="email-address">メールアドレス</Label>
+            <Input
+              id="email-address"
+              v-model="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              class="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              placeholder="メールアドレス"
+            />
+          </div>
+          <div>
+            <Label for="password">パスワード</Label>
             <Input
               id="password"
               v-model="password"

@@ -29,9 +29,4 @@ export default defineNuxtConfig({
      */
     componentDir: './components/ui'
   },
-  runtimeConfig: {
-    public: {
-      adminEmail: process.env.NUXT_ADMIN_EMAIL,
-    }
-  },
 })

@@ -2,14 +2,12 @@
 export const useAuth = () => {
   const user = useSupabaseUser()
   const client = useSupabaseClient()
-  const config = useRuntimeConfig()
 
   const isAuthenticated = computed(() => !!user.value)
 
-  const login = async (password: string) => {
-    // SupabaseではEmailも必須なため、固定の管理者用Emailを使用
+  const login = async (email: string, password: string) => {
     const { error } = await client.auth.signInWithPassword({
-      email: config.public.adminEmail as string,
+      email,
       password,
     })
     if (error) throw error
