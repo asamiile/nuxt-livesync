@@ -59,7 +59,12 @@ onMounted(async () => {
   // プレゼンスイベントを購読
   channel.on('presence', { event: 'sync' }, () => {
     const presenceState = channel.presenceState()
-    connectionCount.value = Object.keys(presenceState).length
+    // 'viewer'として参加しているユーザーのみをカウント
+    const viewerCount = Object.values(presenceState)
+      .flat()
+      // @ts-ignore
+      .filter(p => p.user === 'viewer').length
+    connectionCount.value = viewerCount
   })
 
   channel.subscribe((status: string) => {
