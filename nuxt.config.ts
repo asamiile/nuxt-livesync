@@ -20,17 +20,11 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
 
-  // --- Local development proxy ---
-  // https://nuxt.com/docs/getting-started/deployment#proxy-server-and-api-routes
-  vite: {
-    server: {
-      proxy: {
-        // Proxy /api requests to our FastAPI backend
-        '/api': {
-          target: 'http://127.0.0.1:8000',
-          changeOrigin: true,
-        },
-      },
+  // --- Runtime proxy ---
+  // https://nuxt.com/docs/guide/going-further/proxy-and-server-routes
+  routeRules: {
+    '/api/**': {
+      proxy: 'http://127.0.0.1:8000',
     },
   },
 })
