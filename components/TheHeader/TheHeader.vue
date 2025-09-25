@@ -12,14 +12,14 @@ import {
 } from '@/components/ui/navigation-menu'
 
 const route = useRoute()
-const { logout, authToken } = useAuth()
+const { logout, isAuthenticated } = useAuth()
 
 // /admin/loginページではヘッダー自体を非表示にするか、
 // またはナビゲーションやログアウトボタンを非表示にする。
 // ここでは、認証状態とページパスに基づいてUIを調整する。
 const showAdminControls = computed(() => {
-  // トークンがあり、かつ現在のパスが /admin/login ではない場合にtrue
-  return authToken.value && route.path.startsWith('/admin') && route.path !== '/admin/login'
+  // 認証済みで、かつ現在のパスが /admin/login ではない場合にtrue
+  return isAuthenticated.value && route.path.startsWith('/admin') && route.path !== '/admin/login'
 })
 
 const handleLogout = async () => {
