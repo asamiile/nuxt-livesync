@@ -70,7 +70,13 @@ onMounted(async () => {
 
   // Supabase Realtimeでlive_stateテーブルの変更を購読
   channel = supabase
-    .channel('live-state-channel')
+    .channel('live-state-channel', {
+      config: {
+        presence: {
+          key: `user-${Math.random().toString(36).substring(7)}`, // 簡易的な一意のキー
+        },
+      },
+    })
     .on(
       'postgres_changes',
       {
@@ -81,12 +87,15 @@ onMounted(async () => {
       },
       handleLiveStateUpdate,
     )
-    .subscribe((status, err) => {
+    .subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
         console.log('Supabase Realtime connection established')
+        // 自身のプレゼンス状態を追跡開始
+        const status = await channel?.track({ user: 'viewer' })
+        console.log('Presence tracking status:', status)
       }
       if (status === 'CHANNEL_ERROR') {
-        console.error(`Realtime channel error:`, err)
+        console.error(`Realtime channel error:`, await channel?.unsubscribe())
       }
       if (status === 'TIMED_OUT') {
         console.warn('Realtime connection timed out.')

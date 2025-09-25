@@ -43,37 +43,38 @@ const fetchCues = async () => {
 }
 
 // --- Lifecycle Hooks ---
+let channel: any = null
+
 onMounted(async () => {
   await fetchCues()
-  // 初回取得
-  await fetchConnectionCount()
-  // 3秒ごとに定期取得
-  intervalId = setInterval(fetchConnectionCount, 3000)
+
+  channel = supabase.channel('live-state-channel', {
+    config: {
+      presence: {
+        key: 'admin-user', // 管理者ユーザーとして参加
+      },
+    },
+  })
+
+  // プレゼンスイベントを購読
+  channel.on('presence', { event: 'sync' }, () => {
+    const presenceState = channel.presenceState()
+    connectionCount.value = Object.keys(presenceState).length
+  })
+
+  channel.subscribe((status: string) => {
+    if (status === 'SUBSCRIBED') {
+      // チャンネル参加時に自身のプレゼンスを追跡
+      channel.track({ user: 'admin' })
+    }
+  })
 })
 
 onUnmounted(() => {
-  // コンポーネントが破棄されるときにインターバルをクリア
-  if (intervalId) {
-    clearInterval(intervalId)
+  if (channel) {
+    supabase.removeChannel(channel)
   }
 })
-
-// --- Methods ---
-async function fetchConnectionCount() {
-  try {
-    const data = await $fetch<{ connections: number }>('/api/connections')
-    connectionCount.value = data.connections
-  }
-  catch (err) {
-    // エラー発生時はコンソールに出力し、カウントをリセットするかどうかは要件による
-    console.error('Failed to fetch connection count:', err)
-    // toast({
-    // title: '警告',
-    // description: '接続人数の取得に失敗しました。',
-    // variant: 'destructive',
-    // })
-  }
-}
 
 // --- Handlers ---
 const triggerCue = async (cue: Cue) => {
