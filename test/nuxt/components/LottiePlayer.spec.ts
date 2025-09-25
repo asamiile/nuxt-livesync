@@ -23,7 +23,7 @@ describe('LottiePlayer.vue', () => {
     const wrapper = mount(LottiePlayer, {
       props: { src: 'test.json' },
     })
-    expect(wrapper.text()).toContain('Loading Animation...')
+    expect(wrapper.text()).toContain('Loading...')
   })
 
   it('renders the Lottie player when src is provided', async () => {
