@@ -8,6 +8,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from '.'
+import { Toaster } from '.'
 import { Button } from '../button'
 import { useToast } from './use-toast'
 
@@ -38,6 +39,7 @@ export const Default = {
       ToastTitle,
       ToastViewport,
       Button,
+      Toaster,
     },
     setup() {
       const { toast } = useToast()
@@ -45,12 +47,12 @@ export const Default = {
       return { args, toast }
     },
     template: `
-      <ToastProvider>
+      <div>
         <Button @click="() => toast({ title: 'Hello World' })">
           Show Toast
         </Button>
-        <ToastViewport />
-      </ToastProvider>
+        <Toaster />
+      </div>
     `,
   }),
   args: {},

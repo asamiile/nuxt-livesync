@@ -19,7 +19,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default = {
+export const Default: Story = {
   render: args => ({
     components: { Button },
     setup() {
@@ -31,4 +31,44 @@ export const Default = {
     variant: 'default',
     size: 'default',
   },
-} satisfies Story
+}
+
+export const Destructive: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    variant: 'destructive',
+  },
+}
+
+export const Outline: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    variant: 'outline',
+  },
+}
+
+export const Secondary: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    variant: 'secondary',
+  },
+}
+
+export const Ghost: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    variant: 'ghost',
+  },
+}
+
+export const Link: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    variant: 'link',
+  },
+}
