@@ -36,11 +36,11 @@ const currentCue = ref<Cue | null>(null)
 let socket: WebSocket | null = null
 
 onMounted(async () => {
+  const { $apiFetch } = useNuxtApp()
+
   // Fetch all cues
   try {
-    const fetchedCues = await $fetch<Cue[]>('/api/cues', {
-      // baseURLはNuxtのプロキシ設定に任せる
-    })
+    const fetchedCues = await $apiFetch<Cue[]>('/api/cues')
     cues.value = fetchedCues
   }
   catch (error) {

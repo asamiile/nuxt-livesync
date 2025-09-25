@@ -10,12 +10,18 @@ export const useAuth = () => {
 
   const isAuthenticated = useState('isAuthenticated', () => false)
 
+  const { $apiFetch } = useNuxtApp()
+
   // ログイン処理
   const login = async (password: string) => {
-    const { data, error } = await useFetch<{ token: string }>('/api/login', {
-      method: 'POST',
-      body: { password },
-    })
+    // useFetch は useAsyncData + $fetch のラッパーなので、ここでは $apiFetch を直接使う
+    const { data, error } = await useAsyncData<{ token: string }>(
+      'login',
+      () => $apiFetch('/api/login', {
+        method: 'POST',
+        body: { password },
+      })
+    )
 
     if (error.value) {
       console.error('Login failed:', error.value)
@@ -33,7 +39,7 @@ export const useAuth = () => {
     if (!authToken.value) return
 
     try {
-      await $fetch('/api/logout', {
+      await $apiFetch('/api/logout', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken.value}`,
@@ -72,7 +78,7 @@ export const useAuth = () => {
         }
       }
 
-      const { authenticated } = await $fetch<{ authenticated: boolean }>('/api/verify', {
+      const { authenticated } = await $apiFetch<{ authenticated: boolean }>('/api/verify', {
         headers,
       })
 
