@@ -40,8 +40,8 @@ import LottiePlayer from '~/components/LottiePlayer.vue'
 // APIからデータを取得
 const { data: cues, refresh, pending } = await useFetch<Cue[]>('/api/cues', {
   default: () => [],
-  // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
-  key: `cues-list-${new Date().getTime()}`,
+  // サーバーとクライアントでキーを一致させるため、静的なキーを使用
+  key: 'cues-list',
 })
 
 const isDialogOpen = ref(false)

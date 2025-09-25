@@ -106,9 +106,6 @@ class LoginPayload(BaseModel):
 def login(payload: LoginPayload, response: Response):
     """管理者としてログインし、セッショントークンを発行する"""
     master_password = os.getenv("ADMIN_PASSWORD")
-    # --- デバッグ用ログを追加 ---
-    print(f"Loaded ADMIN_PASSWORD from .env: '{master_password}'")
-    # -------------------------
     if master_password is None:
         raise HTTPException(status_code=500, detail="ADMIN_PASSWORD is not set on the server")
 

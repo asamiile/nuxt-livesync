@@ -12,8 +12,8 @@ const { toast } = useToast()
 // --- State ---
 const { data: cues, error, pending } = await useFetch<Cue[]>('/api/cues', {
   default: () => [],
-  // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
-  key: `onair-cues-${new Date().getTime()}`,
+  // サーバーとクライアントでキーを一致させるため、静的なキーを使用
+  key: 'onair-cues',
 })
 const connectionCount = ref(0)
 const triggeredCueId = ref<string | null>(null)
