@@ -6,7 +6,15 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "shadcn-nuxt",
     "@nuxtjs/storybook",
+    "@nuxtjs/supabase",
   ],
+  supabase: {
+    redirectOptions: {
+      login: '/admin/login',
+      callback: '/confirm',
+      exclude: ['/'],
+    }
+  },
   css: ['@/assets/css/tailwind.css'],
   shadcn: {
     /**
@@ -18,19 +26,5 @@ export default defineNuxtConfig({
      * @default "./components/ui"
      */
     componentDir: './components/ui'
-  },
-
-  // --- Local development proxy ---
-  // https://nuxt.com/docs/getting-started/deployment#proxy-server-and-api-routes
-  vite: {
-    server: {
-      proxy: {
-        // Proxy /api requests to our FastAPI backend
-        '/api': {
-          target: 'http://127.0.0.1:8000',
-          changeOrigin: true,
-        },
-      },
-    },
   },
 })
