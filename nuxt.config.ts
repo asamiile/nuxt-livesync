@@ -20,4 +20,11 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
 
+  // --- Runtime proxy ---
+  // https://nuxt.com/docs/guide/going-further/proxy-and-server-routes
+  routeRules: {
+    '/api/**': {
+      proxy: 'http://127.0.0.1:8000/api/**',
+    },
+  },
 })
