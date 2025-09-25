@@ -5,5 +5,6 @@ export default defineVitestConfig({
     globals: true,
     environment: 'nuxt',
     include: ['test/nuxt/**/*.spec.ts'],
+    setupFiles: ['test/setup.ts'],
   },
 })

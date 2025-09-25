@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import type { Cue } from '~/types/cue'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
@@ -35,14 +35,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import LottiePlayer from '~/components/LottiePlayer.vue'
 
+// Supabaseクライアントを取得
+const supabase = useSupabaseClient()
+
 // --- State ---
 
-// APIからデータを取得
-const { data: cues, refresh, pending } = await useFetch<Cue[]>('/api/cues', {
-  default: () => [],
-  // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
-  key: `cues-list-${new Date().getTime()}`,
-})
+const cues = ref<Cue[] | null>([])
+const pending = ref(true)
 
 const isDialogOpen = ref(false)
 const editingCue = ref<Cue | null>(null)
@@ -57,6 +56,32 @@ const cueFormData = ref<Omit<Cue, 'id'>>({
 // ダイアログのタイトルを動的に変更
 const dialogTitle = computed(() => editingCue.value ? '演出を編集' : '新規演出を追加')
 const dialogDescription = computed(() => editingCue.value ? '演出の内容を更新します。' : '新しい演出の詳細を入力してください。')
+
+// --- Data Fetching ---
+
+// データを取得する関数
+const fetchCues = async () => {
+  pending.value = true
+  try {
+    const { data, error } = await supabase
+      .from('cues')
+      .select('*')
+      .order('id', { ascending: true }) // IDでソート
+
+    if (error) throw error
+    cues.value = data
+  } catch (error) {
+    console.error('Failed to fetch cues:', error)
+    alert('演出の取得に失敗しました。')
+  } finally {
+    pending.value = false
+  }
+}
+
+// コンポーネントがマウントされた時にデータを取得
+onMounted(() => {
+  fetchCues()
+})
 
 
 // --- Watchers ---
@@ -73,6 +98,11 @@ watch(() => cueFormData.value.type, (newType) => {
   }
 })
 
+
+// --- Expose for testing ---
+defineExpose({
+  isDialogOpen,
+})
 
 // --- Handlers ---
 
@@ -109,20 +139,21 @@ const handleSubmit = async () => {
   try {
     if (editingCue.value) {
       // 編集モード
-      await $fetch(`/api/cues/${editingCue.value.id}`, {
-        method: 'PUT',
-        body: cueFormData.value,
-      })
+      const { error } = await supabase
+        .from('cues')
+        .update(cueFormData.value)
+        .eq('id', editingCue.value.id)
+      if (error) throw error
     } else {
       // 新規追加モード
-      await $fetch('/api/cues', {
-        method: 'POST',
-        body: cueFormData.value,
-      })
+      const { error } = await supabase
+        .from('cues')
+        .insert([cueFormData.value])
+      if (error) throw error
     }
 
     isDialogOpen.value = false
-    await refresh() // テーブルを更新
+    await fetchCues() // テーブルを更新
 
   } catch (error) {
     console.error('Failed to save cue:', error)
@@ -133,10 +164,12 @@ const handleSubmit = async () => {
 // 削除処理
 const handleDelete = async (cueId: string) => {
   try {
-    await $fetch(`/api/cues/${cueId}`, {
-      method: 'DELETE',
-    })
-    await refresh() // テーブルを更新
+    const { error } = await supabase
+      .from('cues')
+      .delete()
+      .eq('id', cueId)
+    if (error) throw error
+    await fetchCues() // テーブルを更新
   } catch (error) {
     console.error('Failed to delete cue:', error)
     alert('演出の削除に失敗しました。')

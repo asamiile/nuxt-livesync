@@ -25,6 +25,12 @@ const showAdminControls = computed(() => {
 const handleLogout = async () => {
   await logout()
 }
+
+// Expose for testing
+defineExpose({
+  isAuthenticated,
+  handleLogout,
+})
 </script>
 
 <template>
