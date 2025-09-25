@@ -23,7 +23,7 @@ defineProps({
     />
     <template #fallback>
       <div class="h-full w-full flex items-center justify-center">
-        <p>Loading Animation...</p>
+        <p>Loading...</p>
       </div>
     </template>
   </ClientOnly>
