@@ -10,9 +10,11 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from redis import Redis
 from redis.exceptions import RedisError
+from pathlib import Path
 
-# .envファイルを読み込む (ローカル開発用)
-load_dotenv()
+# .envファイルを確実に見つけるために、このファイルの場所を基準にパスを構築
+dotenv_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=dotenv_path)
 
 # FastAPIインスタンスの作成
 app = FastAPI()
