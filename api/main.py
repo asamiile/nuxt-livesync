@@ -1,71 +1,84 @@
 import os
-import uuid
-import json
-import secrets
-from datetime import timedelta
-from typing import List, Annotated
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Response, Header
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from redis import Redis
-from redis.exceptions import RedisError
+from supabase import create_client, Client
 
-# .envファイルを読み込む (ローカル開発用)
+# .envファイルを読み込む
 load_dotenv()
 
-# FastAPIインスタンスの作成
+# Supabaseクライアントを初期化
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_SERVICE_KEY")
+if not url or not key:
+    raise ValueError("Supabase URL and Key must be set in environment variables.")
+supabase: Client = create_client(url, key)
+
 app = FastAPI()
 
-# --- CORS設定 ---
-# 環境変数からVercelのURLを取得
-VERCEL_URL = os.getenv("VERCEL_URL")
-# VercelのプレビューURLと本番URL（想定）を許可リストに追加
-# 例: nuxt-livesync-lx3kfcfmg-asamiiles-projects.vercel.app
-# 例: nuxt-livesync.vercel.app
-allowed_origins = [
-    "http://localhost:3000",
-]
+# --- Pydanticモデル (リクエストボディの検証用) ---
+class CreateCuePayload(BaseModel):
+    name: str
+    type: str
+    value: str
 
-if VERCEL_URL:
-    # VercelのプレビューデプロイメントURL
-    allowed_origins.append(f"https://{VERCEL_URL}")
-    # 本番環境のURL (プロジェクト名から生成)
-    project_name = VERCEL_URL.split('-')[0]
-    if project_name:
-        allowed_origins.append(f"https://{project_name}.vercel.app")
+class UpdateCuePayload(BaseModel):
+    name: str
+    type: str
+    value: str
 
-# CORSミドルウェアの設定
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-# --- Vercel KVへの接続 ---
-from dependencies.database import kv, CUES_KEY
-
-
-# --- WebSocket接続管理 ---
-from websocket.manager import manager
-
-
-# --- データモデルの定義 (Pydantic) ---
-from models.cue_models import Cue, CreateCuePayload, UpdateCuePayload
-from models.auth_models import LoginPayload
-
-
-# --- APIエンドポイントの定義 ---
-from routers import auth, cues, websocket
-
-app.include_router(auth.router)
-app.include_router(cues.router)
-app.include_router(websocket.router)
-
-# Add a root endpoint for health checks
+# --- APIエンドポイント ---
 @app.get("/api")
 def read_root():
     return {"status": "ok", "message": "Welcome to the Nuxt LiveSync API"}
+
+@app.get("/api/cues")
+def get_cues():
+    try:
+        response = supabase.table('cues').select("*").order('created_at').execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/cues", status_code=201)
+def create_cue(payload: CreateCuePayload):
+    try:
+        response = supabase.table('cues').insert(payload.dict()).execute()
+        return response.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/cues/{cue_id}")
+def update_cue(cue_id: str, payload: UpdateCuePayload):
+    try:
+        response = supabase.table('cues').update(payload.dict()).eq('id', cue_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Cue not found")
+        return response.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/cues/{cue_id}", status_code=204)
+def delete_cue(cue_id: str):
+    try:
+        response = supabase.table('cues').delete().eq('id', cue_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Cue not found")
+        return
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/cues/trigger/{cue_id}")
+def trigger_cue(cue_id: str):
+    """Supabaseのlive_stateテーブルを更新してリアルタイム通知を発火させる"""
+    try:
+        # 常にid=1の行を更新する
+        response = supabase.table('live_state').update({
+            'active_cue_id': cue_id,
+            'updated_at': 'now()'
+        }).eq('id', 1).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Live state row not found")
+        return {"message": f"Cue {cue_id} triggered successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
