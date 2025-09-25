@@ -20,19 +20,27 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
 
+  components: [
+    {
+      path: '~/components/ui',
+      // The prefix is defined in `shadcn.prefix`
+      prefix: '',
+      ignore: ['**/index.ts'],
+    },
+    '~/components',
+  ],
+
   // --- Local development proxy ---
   // https://nuxt.com/docs/getting-started/deployment#proxy-server-and-api-routes
   vite: {
     server: {
-      proxy: process.env.STORYBOOK
-        ? undefined
-        : {
-            // Proxy /api requests to our FastAPI backend
-            '/api': {
-              target: 'http://127.0.0.1:8000',
-              changeOrigin: true,
-            },
-          },
+      proxy: {
+        // Proxy /api requests to our FastAPI backend
+        '/api': {
+          target: 'http://127.0.0.1:8000',
+          changeOrigin: true,
+        },
+      },
     },
   },
 })
