@@ -1,19 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-
-import Input from './Input.vue'
+import { Input } from '.'
 
 const meta = {
-  title: 'Component/Input',
+  title: 'UI/Input',
   component: Input,
-  tags: ['autodocs'],
-  args: {
-    modelValue: 'Hello World',
-  },
 } satisfies Meta<typeof Input>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
-  args: {},
-}
+export const Default = {
+  render: args => ({
+    components: { Input },
+    setup() {
+      return { args }
+    },
+    template: '<Input v-bind="args" />',
+  }),
+  args: {
+    placeholder: 'Enter text...',
+  },
+} satisfies Story
