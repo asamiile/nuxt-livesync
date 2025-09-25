@@ -26,16 +26,8 @@ logs
 *storybook.log
 storybook-static
 
-# Python virtual environment
-api/venv
-
-# Python cache
-__pycache__/
-*.pyc
-
 # Vercel
 .vercel
-
 
 # Supabase
 supabase/.temp/
