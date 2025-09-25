@@ -20,9 +20,6 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
 
-  routeRules: {},
-
-
   // --- Local development proxy ---
   // https://nuxt.com/docs/getting-started/deployment#proxy-server-and-api-routes
   vite: {
