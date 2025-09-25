@@ -25,4 +25,10 @@ INSERT INTO public.live_state (id) VALUES (1);
 ALTER TABLE public.cues REPLICA IDENTITY FULL;
 ALTER TABLE public.live_state REPLICA IDENTITY FULL;
 
-CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
+-- supabase_realtime PUBLICATION が存在しない場合のみ作成する
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+        CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
+    END IF;
+END $$;
