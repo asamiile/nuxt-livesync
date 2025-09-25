@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Film } from 'lucide-vue-next'
 import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast/use-toast'
@@ -8,63 +7,91 @@ import { Skeleton } from '@/components/ui/skeleton'
 import LottiePlayer from '~/components/LottiePlayer.vue'
 
 const { toast } = useToast()
+const supabase = useSupabaseClient()
 
 // --- State ---
-const { data: cues, error, pending } = await useFetch<Cue[]>('/api/cues', {
-  default: () => [],
-  // ページにアクセスするたびに新しいキーを生成し、常に最新のデータを取得する
-  key: `onair-cues-${new Date().getTime()}`,
-})
+const cues = ref<Cue[] | null>([])
+const pending = ref(true)
 const connectionCount = ref(0)
 const triggeredCueId = ref<string | null>(null)
 let intervalId: NodeJS.Timeout | null = null
 
+// --- Data Fetching ---
+const fetchCues = async () => {
+  pending.value = true
+  try {
+    const { data, error } = await supabase
+      .from('cues')
+      .select('*')
+      .order('id', { ascending: true })
+
+    if (error) {
+      throw error
+    }
+    cues.value = data
+  }
+  catch (err: any) {
+    toast({
+      title: 'エラー',
+      description: '演出リストの取得に失敗しました。',
+      variant: 'destructive',
+    })
+  }
+  finally {
+    pending.value = false
+  }
+}
+
 // --- Lifecycle Hooks ---
+let channel: any = null
+
 onMounted(async () => {
-  // 初回取得
-  await fetchConnectionCount()
-  // 3秒ごとに定期取得
-  intervalId = setInterval(fetchConnectionCount, 3000)
+  await fetchCues()
+
+  channel = supabase.channel('live-state-channel', {
+    config: {
+      presence: {
+        key: 'admin-user', // 管理者ユーザーとして参加
+      },
+    },
+  })
+
+  // プレゼンスイベントを購読
+  channel.on('presence', { event: 'sync' }, () => {
+    const presenceState = channel.presenceState()
+    // 'viewer'として参加しているユーザーのみをカウント
+    const viewerCount = Object.values(presenceState)
+      .flat()
+      // @ts-ignore
+      .filter(p => p.user === 'viewer').length
+    connectionCount.value = viewerCount
+  })
+
+  channel.subscribe((status: string) => {
+    if (status === 'SUBSCRIBED') {
+      // チャンネル参加時に自身のプレゼンスを追跡
+      channel.track({ user: 'admin' })
+    }
+  })
 })
 
 onUnmounted(() => {
-  // コンポーネントが破棄されるときにインターバルをクリア
-  if (intervalId) {
-    clearInterval(intervalId)
+  if (channel) {
+    supabase.removeChannel(channel)
   }
 })
-
-if (error.value) {
-  toast({
-    title: 'エラー',
-    description: '演出リストの取得に失敗しました。',
-    variant: 'destructive',
-  })
-}
-
-// --- Methods ---
-async function fetchConnectionCount() {
-  try {
-    const data = await $fetch<{ connections: number }>('/api/connections')
-    connectionCount.value = data.connections
-  }
-  catch (err) {
-    // エラー発生時はコンソールに出力し、カウントをリセットするかどうかは要件による
-    console.error('Failed to fetch connection count:', err)
-    // toast({
-    // title: '警告',
-    // description: '接続人数の取得に失敗しました。',
-    // variant: 'destructive',
-    // })
-  }
-}
 
 // --- Handlers ---
 const triggerCue = async (cue: Cue) => {
   try {
-    await $fetch(`/api/cues/trigger/${cue.id}`, {
-      method: 'POST',
-    })
+    // live_stateテーブルの単一のレコード (id=1) を更新
+    const { error } = await supabase
+      .from('live_state')
+      .update({ active_cue_id: cue.id, updated_at: new Date().toISOString() })
+      .eq('id', 1) // live_stateテーブルには常に1つのレコードしか存在しない想定
+
+    if (error) throw error
+
     toast({
       title: '成功',
       description: `演出 ${cue.name} を実行しました。`,

@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { Cue } from '~/types/cue'
 
 // Define the layout for this page
@@ -31,61 +32,82 @@ definePageMeta({
   layout: false, // No layout for this page
 })
 
+const supabase = useSupabaseClient()
 const cues = ref<Cue[]>([])
 const currentCue = ref<Cue | null>(null)
-let socket: WebSocket | null = null
+let channel: RealtimeChannel | null = null
 
-onMounted(async () => {
-  // Fetch all cues
-  try {
-    const fetchedCues = await $fetch<Cue[]>('/api/cues', {
-      // baseURLはNuxtのプロキシ設定に任せる
-    })
-    cues.value = fetchedCues
-  }
-  catch (error) {
-    console.error('Failed to fetch cues:', error)
-    // エラーハンドリング: 例えば、ユーザーに通知を表示するなど
-    return
-  }
-
-  // Setup WebSocket
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  // Vercel環境では `window.location.host` にポートが含まれないが、
-  // ローカル開発環境では `localhost:3000` のようになる。
-  // FastAPIサーバーは8000番で動いているため、ホスト名を置換する必要がある。
-  const host = process.dev ? 'localhost:8000' : window.location.host
-  const wsUrl = `${wsProtocol}//${host}/ws/live`
-
-  socket = new WebSocket(wsUrl)
-
-  socket.onopen = () => {
-    console.log('WebSocket connection established')
-  }
-
-  socket.onmessage = (event) => {
-    const cueId = event.data
-    const receivedCue = cues.value.find(c => c.id === cueId)
+// --- Handlers ---
+const handleLiveStateUpdate = (payload: any) => {
+  const newCueId = payload.new.active_cue_id
+  if (newCueId) {
+    const receivedCue = cues.value.find(c => c.id === newCueId)
     if (receivedCue) {
       currentCue.value = receivedCue
     }
     else {
-      console.warn(`Cue with id "${cueId}" not found.`)
+      console.warn(`Cue with id "${newCueId}" not found.`)
     }
   }
+  else {
+    // active_cue_idがnullに設定された場合、待機状態に戻す
+    currentCue.value = null
+  }
+}
 
-  socket.onclose = () => {
-    console.log('WebSocket connection closed')
+// --- Lifecycle Hooks ---
+onMounted(async () => {
+  // 最初にすべての演出データを取得
+  try {
+    const { data: fetchedCues, error } = await supabase.from('cues').select('*')
+    if (error) throw error
+    cues.value = fetchedCues
+  }
+  catch (error) {
+    console.error('Failed to fetch cues:', error)
+    return
   }
 
-  socket.onerror = (error) => {
-    console.error('WebSocket error:', error)
-  }
+  // Supabase Realtimeでlive_stateテーブルの変更を購読
+  channel = supabase
+    .channel('live-state-channel', {
+      config: {
+        presence: {
+          key: `user-${Math.random().toString(36).substring(7)}`, // 簡易的な一意のキー
+        },
+      },
+    })
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'live_state',
+        filter: 'id=eq.1', // id=1のレコードの変更のみを監視
+      },
+      handleLiveStateUpdate,
+    )
+    .subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Supabase Realtime connection established')
+        // 自身のプレゼンス状態を追跡開始
+        const status = await channel?.track({ user: 'viewer' })
+        console.log('Presence tracking status:', status)
+      }
+      if (status === 'CHANNEL_ERROR') {
+        console.error(`Realtime channel error:`, await channel?.unsubscribe())
+      }
+      if (status === 'TIMED_OUT') {
+        console.warn('Realtime connection timed out.')
+      }
+    })
 })
 
 onUnmounted(() => {
-  if (socket) {
-    socket.close()
+  if (channel) {
+    supabase.removeChannel(channel)
+    channel = null
+    console.log('Supabase Realtime channel removed')
   }
 })
 </script>

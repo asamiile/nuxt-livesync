@@ -25,6 +25,12 @@ const showAdminControls = computed(() => {
 const handleLogout = async () => {
   await logout()
 }
+
+// Expose for testing
+defineExpose({
+  isAuthenticated,
+  handleLogout,
+})
 </script>
 
 <template>
@@ -34,31 +40,33 @@ const handleLogout = async () => {
         <h1 class="text-2xl font-bold">
           <NuxtLink to="/">LiveSync Director</NuxtLink>
         </h1>
-        <nav v-if="showAdminControls">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NuxtLink to="/admin/cues" legacy-behavior pass-through>
-                  <NavigationMenuLink :active="route.path === '/admin/cues'" :class="navigationMenuTriggerStyle()">
-                    演出管理
-                  </NavigationMenuLink>
-                </NuxtLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NuxtLink to="/admin/onair" legacy-behavior pass-through>
-                  <NavigationMenuLink :active="route.path === '/admin/onair'" :class="navigationMenuTriggerStyle()">
-                    本番操作
-                  </NavigationMenuLink>
-                </NuxtLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Button variant="outline" size="sm" @click="handleLogout">
-                  ログアウト
-                </Button>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </nav>
+        <ClientOnly>
+          <nav v-if="showAdminControls">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NuxtLink to="/admin/cues" legacy-behavior pass-through>
+                    <NavigationMenuLink :active="route.path === '/admin/cues'" :class="navigationMenuTriggerStyle()">
+                      演出管理
+                    </NavigationMenuLink>
+                  </NuxtLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NuxtLink to="/admin/onair" legacy-behavior pass-through>
+                    <NavigationMenuLink :active="route.path === '/admin/onair'" :class="navigationMenuTriggerStyle()">
+                      本番操作
+                    </NavigationMenuLink>
+                  </NuxtLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Button variant="outline" size="sm" @click="handleLogout">
+                    ログアウト
+                  </Button>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </nav>
+        </ClientOnly>
       </div>
     </div>
   </header>
