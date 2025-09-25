@@ -27,4 +27,12 @@ export default defineNuxtConfig({
       proxy: 'http://127.0.0.1:8000/api/**',
     },
   },
+
+  // --- Runtime config ---
+  // https://nuxt.com/docs/guide/going-further/runtime-config
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '',
+    },
+  },
 })

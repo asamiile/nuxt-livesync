@@ -50,12 +50,20 @@ onMounted(async () => {
   }
 
   // Setup WebSocket
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  // Vercel環境では `window.location.host` にポートが含まれないが、
-  // ローカル開発環境では `localhost:3000` のようになる。
-  // FastAPIサーバーは8000番で動いているため、ホスト名を置換する必要がある。
-  const host = process.dev ? 'localhost:8000' : window.location.host
-  const wsUrl = `${wsProtocol}//${host}/ws/live`
+  const config = useRuntimeConfig()
+  const apiBaseUrl = config.public.apiBaseUrl || ''
+
+  let wsUrl: string
+  if (apiBaseUrl) {
+    // Vercel環境: 環境変数からWebSocket URLを構築
+    // https://your-app.vercel.app -> wss://your-app.vercel.app
+    wsUrl = apiBaseUrl.replace(/^http/, 'ws') + '/ws/live'
+  } else {
+    // ローカル環境: プロキシ経由で接続
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const host = window.location.host // localhost:3000
+    wsUrl = `${wsProtocol}//${host}/ws/live`
+  }
 
   socket = new WebSocket(wsUrl)
 
