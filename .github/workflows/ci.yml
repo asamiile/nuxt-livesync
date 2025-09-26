@@ -30,11 +30,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright system dependencies for Chromium
-        run: pnpm exec playwright install-deps chromium
+      - name: Install Playwright system dependencies
+        run: pnpm exec playwright install-deps
 
-      - name: Install Chromium browser
-        run: pnpm exec playwright install chromium
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install
 
       - name: Run tests
         env:
