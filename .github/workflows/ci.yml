@@ -57,15 +57,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install
 
       # Playwrightのシステム依存関係をインストール
       - name: Install Playwright system dependencies
         run: pnpm exec playwright install-deps
-
-      # Playwrightのブラウザ本体をインストール
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install
 
       # E2Eテストを実行（環境変数を渡す）
       - name: Run E2E tests
