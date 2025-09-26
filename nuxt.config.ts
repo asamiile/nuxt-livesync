@@ -2,12 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: [
-    "@nuxtjs/tailwindcss",
-    "shadcn-nuxt",
-    // "@nuxtjs/storybook",
-    "@nuxtjs/supabase",
-  ],
+  modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", "@nuxtjs/supabase", '@nuxtjs/storybook'],
   supabase: {
     // Provide dummy values for testing if environment variables are not set
     url: process.env.SUPABASE_URL || 'http://localhost:54321',
