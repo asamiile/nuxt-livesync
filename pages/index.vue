@@ -28,6 +28,9 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { Cue } from '~/types/cue'
 import LottiePlayer from '~/components/LottiePlayer/LottiePlayer.vue'
 
+useHead({
+  title: 'LiveSync'
+})
 // Define the layout for this page
 definePageMeta({
   layout: false, // No layout for this page
