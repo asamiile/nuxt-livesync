@@ -79,11 +79,13 @@ describe('pages/admin/cues.vue', () => {
     await nextTick()
 
     saveButton.click()
-    await nextTick() // Allow async handler to complete
+
+    // Wait for the async handler to complete by polling the assertion
+    await vi.waitFor(() => {
+      expect(mockOrder).toHaveBeenCalledTimes(2)
+    })
 
     expect(mockInsert).toHaveBeenCalledOnce()
-    // Check that fetchCues was called again by checking its inner call to order()
-    expect(mockOrder).toHaveBeenCalledTimes(2)
   })
 
   it('should call update when saving an edited cue', async () => {
@@ -103,11 +105,13 @@ describe('pages/admin/cues.vue', () => {
     await nextTick()
 
     saveButton.click()
-    await nextTick()
+
+    await vi.waitFor(() => {
+      expect(mockOrder).toHaveBeenCalledTimes(2)
+    })
 
     expect(mockUpdate).toHaveBeenCalledOnce()
     expect(mockEq).toHaveBeenCalledWith('id', initialCues[0].id)
-    expect(mockOrder).toHaveBeenCalledTimes(2)
   })
 
   it('should call delete when a cue is deleted', async () => {
@@ -122,10 +126,12 @@ describe('pages/admin/cues.vue', () => {
     const confirmButton = Array.from(alertDialog.querySelectorAll('button')).find(b => b.textContent.trim() === 'はい、削除します')
 
     confirmButton.click()
-    await nextTick()
+
+    await vi.waitFor(() => {
+      expect(mockOrder).toHaveBeenCalledTimes(2)
+    })
 
     expect(mockDelete).toHaveBeenCalledOnce()
     expect(mockEq).toHaveBeenCalledWith('id', initialCues[0].id)
-    expect(mockOrder).toHaveBeenCalledTimes(2)
   })
 })
