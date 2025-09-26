@@ -33,6 +33,11 @@ Vitest is temporarily discontinued due to errors
 
 - [Livesync App](https://nuxt-livesync.vercel.app)
 
+```
+admin@livesync.com
+password
+```
+
 ## Getting Started
 
 ### Nuxt
