@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col min-h-screen bg-[#3C3C3C]">
     <TheHeader />
-    <main class="flex-grow container mx-auto px-5 py-10 sm:py-20">
+    <main class="flex-grow container max-w-5xl mx-auto px-5 py-10 sm:py-20">
       <slot />
     </main>
     <footer class="py-4 bg-[#3C3C3C]">
