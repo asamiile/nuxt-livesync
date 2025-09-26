@@ -26,6 +26,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { Cue } from '~/types/cue'
+import LottiePlayer from '~/components/LottiePlayer/LottiePlayer.vue'
 
 // Define the layout for this page
 definePageMeta({

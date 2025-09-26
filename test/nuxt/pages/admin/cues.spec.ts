@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import CuesPage from '~/pages/admin/cues.vue'
+import LottiePlayer from '~/components/LottiePlayer/LottiePlayer.vue'
 import { nextTick } from 'vue'
 
 // --- Mocks for Supabase Client ---
