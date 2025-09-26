@@ -23,7 +23,6 @@ Supabaseを利用したデータ管理と、Nuxt 3による高速なUI表示を�
 - UI Component: shadcn/vue
 - CSS Framework: Tailwind CSS
 - UI Catalog: Storybook
-Vitest is temporarily discontinued due to errors
 - Baas: Supabase
 - Test: Vitest, Playwright
 - Deploy: Vercel
