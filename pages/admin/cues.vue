@@ -254,18 +254,18 @@ const handleDelete = async (cueId: string) => {
         <TableBody v-if="pending">
           <TableRow v-for="n in 5" :key="n">
             <TableCell>
-              <Skeleton class="h-5 w-3/4" />
+              <Skeleton class="h-6 w-3/4" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-5 w-1/2" />
+              <Skeleton class="h-6 w-1/2" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-5 w-full" />
+              <Skeleton class="h-6 w-full" />
             </TableCell>
             <TableCell class="text-right">
               <div class="flex justify-end gap-2">
-                <Skeleton class="h-8 w-16" />
-                <Skeleton class="h-8 w-16" />
+                <Skeleton class="h-9 w-[3.25rem]" />
+                <Skeleton class="h-9 w-[3.25rem]" />
               </div>
             </TableCell>
           </TableRow>
