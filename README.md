@@ -1,7 +1,21 @@
 # Livesync App
 
+Livesync Appは、リアルタイムで演出（カラー・アニメーション等）を配信・同期できるライブビューアアプリケーションです。
+Supabaseを利用したデータ管理と、Nuxt 3による高速なUI表示を特徴としています。
+管理者は演出を操作し、観客は即座に反映された演出を体験できます。
 
 ## Overview
+
+### Features
+
+- リアルタイムで演出（カラー・アニメーション等）を配信・同期
+- 管理者による演出操作・切り替え
+- 観客側は即座に演出を受信・表示
+- Supabaseによるデータ管理・リアルタイム通信
+- Lottieアニメーション対応
+- StorybookによるUIカタログ
+- Tailwind CSSによるレスポンシブデザイン
+- E2Eテスト（Playwright）・ユニットテスト（Vitest）対応
 
 ### Technology Stack
 
@@ -10,15 +24,14 @@
 - CSS Framework: Tailwind CSS
 - UI Catalog: Storybook
 Vitest is temporarily discontinued due to errors
-- Data Base: Supabase
-- Test: Vitest
+- Baas: Supabase
+- Test: Vitest, Playwright
 - Deploy: Vercel
 
 
 ### demo
 
 - [Livesync App](https://nuxt-livesync.vercel.app)
-- [Stoyrbook]()
 
 ## Getting Started
 
@@ -94,4 +107,13 @@ pnpm run storybook
 
 ```bash
 pnpm run test
+```
+
+
+### Playwright
+
+- Run E2E Test
+
+```bash
+pnpm test:e2e
 ```
