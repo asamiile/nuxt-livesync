@@ -5,5 +5,10 @@ export default defineVitestConfig({
   test: {
     globals: true,
     environment: 'nuxt',
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/test/e2e/**',
+    ],
   },
 })
