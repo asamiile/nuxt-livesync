@@ -8,7 +8,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "test": "vitest run",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "vitest run -c vitest.config.ts",
+    "test:e2e": "vitest run -c vitest.config.e2e.ts",
     "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -43,6 +45,7 @@
     "storybook": "^9.1.8",
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "dotenv": "^16.4.5"
   }
 }
