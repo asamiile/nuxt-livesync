@@ -68,4 +68,23 @@ test.describe('認証機能', () => {
       });
     }
   });
+
+  // テストケース: 認証済みでログインページにアクセスするとリダイレクトされること
+  test('認証済みでログインページにアクセスするとリダイレクトされること', async ({ page }) => {
+    // 環境変数がなければテストをスキップ
+    test.skip(!hasAuthEnv, 'テスト用の認証情報が設定されていません');
+
+    // 1. ログイン処理
+    await page.goto('/admin/login');
+    await page.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
+    await page.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
+    await page.getByRole('button', { name: 'ログイン' }).click();
+    await expect(page).toHaveURL('/admin/cues');
+
+    // 2. ログインページに再度アクセス
+    await page.goto('/admin/login');
+
+    // 3. /admin/cues にリダイレクトされることを確認
+    await expect(page).toHaveURL('/admin/cues');
+  });
 });

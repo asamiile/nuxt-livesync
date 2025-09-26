@@ -37,6 +37,7 @@
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@playwright/test": "^1.55.1",
     "@storybook/addon-docs": "^9.1.8",
+    "@supabase/supabase-js": "^2.58.0",
     "@types/node": "^18.17.5",
     "@vitest/ui": "3.2.4",
     "@vue/test-utils": "^2.4.6",
