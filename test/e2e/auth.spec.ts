@@ -51,7 +51,7 @@ test.describe('認証機能', () => {
     await expect(page).toHaveURL('/admin/login');
 
     // 5. 「ログイン失敗」のトーストが表示されることを確認
-    const toast = page.getByText('ログイン失敗');
+    const toast = page.getByText('ログイン失敗', { exact: true });
     await expect(toast).toBeVisible();
   });
 
