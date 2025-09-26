@@ -4,7 +4,7 @@ import type { Cue } from '~/types/cue'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
-import LottiePlayer from '~/components/LottiePlayer.vue'
+import LottiePlayer from '~/components/LottiePlayer/LottiePlayer.vue'
 
 const { toast } = useToast()
 const supabase = useSupabaseClient()

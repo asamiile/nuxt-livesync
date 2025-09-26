@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/table'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
-import LottiePlayer from '~/components/LottiePlayer.vue'
+import LottiePlayer from '~/components/LottiePlayer/LottiePlayer.vue'
 
 // Supabaseクライアントを取得
 const supabase = useSupabaseClient()

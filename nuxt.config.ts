@@ -5,12 +5,13 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/tailwindcss",
     "shadcn-nuxt",
-    "@nuxtjs/storybook",
+    // "@nuxtjs/storybook",
     "@nuxtjs/supabase",
   ],
   supabase: {
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_SERVICE_KEY,
+    // Provide dummy values for testing if environment variables are not set
+    url: process.env.SUPABASE_URL || 'http://localhost:54321',
+    key: process.env.SUPABASE_KEY || 'dummykey', // Use SUPABASE_KEY for the anon key
     redirectOptions: {
       login: '/admin/login',
       callback: '/confirm',

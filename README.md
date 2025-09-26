@@ -7,8 +7,9 @@
 
 - Front-end Framework: Nuxt.js v3
 - UI Component: shadcn/vue
-- CSS Framework: Tailwind CSS v4
+- CSS Framework: Tailwind CSS
 - UI Catalog: Storybook
+Vitest is temporarily discontinued due to errors
 - Data Base: Supabase
 - Test: Vitest
 - Deploy: Vercel
