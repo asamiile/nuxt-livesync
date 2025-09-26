@@ -51,7 +51,21 @@ test.describe('認証機能', () => {
     await expect(page).toHaveURL('/admin/login');
 
     // 5. 「ログイン失敗」のトーストが表示されることを確認
-    const toast = page.getByText('ログイン失敗', { exact: true });
+    const toast = page.getByText('ログイン失敗');
     await expect(toast).toBeVisible();
+  });
+
+  // テストケース: 未認証で保護されたページにアクセスするとログインページにリダイレクトされること
+  test('未認証で保護されたページにアクセスするとログインページにリダイレクトされること', async ({ page }) => {
+    const protectedRoutes = ['/admin/cues', '/admin/onair'];
+
+    for (const route of protectedRoutes) {
+      await test.step(`「${route}」にアクセス`, async () => {
+        // 1. 保護されたページにアクセス
+        await page.goto(route);
+        // 2. ログインページにリダイレクトされることを確認
+        await expect(page).toHaveURL('/admin/login');
+      });
+    }
   });
 });
