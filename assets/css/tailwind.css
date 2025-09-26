@@ -22,6 +22,9 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
+    --skeleton-start: 220 14% 90%;
+    --skeleton-end: 220 13% 82%;
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
@@ -53,6 +56,9 @@
 
     --muted: 215 12% 35%;
     --muted-foreground: 215 20.2% 65.1%;
+
+    --skeleton-start: 215 12% 25%;
+    --skeleton-end: 215 12% 35%;
 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
