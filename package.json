@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare",
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "vitest run -c vitest.config.ts",
-    "test:e2e": "vitest run -c vitest.config.e2e.ts",
+    "test:e2e": "pnpm exec playwright install && vitest run -c vitest.config.e2e.ts",
     "test:ui": "vitest --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
