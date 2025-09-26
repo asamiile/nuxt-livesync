@@ -11,7 +11,7 @@
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "vitest run -c vitest.config.ts",
     "test:e2e": "pnpm exec playwright-core install && vitest run -c vitest.config.e2e.ts",
-    "test:ui": "vitest --ui",
+    "test:ui": "vitest --ui -c vitest.config.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
