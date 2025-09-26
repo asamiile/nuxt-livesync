@@ -34,4 +34,24 @@ test.describe('認証機能', () => {
     // 7. ログアウト後、ログインページに戻っていることを確認
     await expect(page).toHaveURL('/admin/login');
   });
+
+  // テストケース: 無効な認証情報でログインに失敗すること
+  test('無効な認証情報でログインに失敗すること', async ({ page }) => {
+    // 1. ログインページにアクセス
+    await page.goto('/admin/login');
+
+    // 2. 無効な認証情報を入力
+    await page.getByLabel('メールアドレス').fill('invalid@example.com');
+    await page.getByLabel('パスワード').fill('invalidpassword');
+
+    // 3. 「ログイン」ボタンをクリック
+    await page.getByRole('button', { name: 'ログイン' }).click();
+
+    // 4. URLが変わらないことを確認
+    await expect(page).toHaveURL('/admin/login');
+
+    // 5. 「ログイン失敗」のトーストが表示されることを確認
+    const toast = page.getByText('ログイン失敗');
+    await expect(toast).toBeVisible();
+  });
 });
