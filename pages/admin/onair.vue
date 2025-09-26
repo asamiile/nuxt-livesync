@@ -122,7 +122,7 @@ const triggerCue = async (cue: Cue) => {
     <!-- Loading Skeleton -->
     <div v-if="pending" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <div v-for="n in 10" :key="n">
-        <Skeleton class="h-[12.5rem] w-full" />
+        <Skeleton class="h-40 md:h-48 w-full" />
       </div>
     </div>
 
