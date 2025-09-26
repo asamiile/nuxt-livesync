@@ -31,7 +31,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright Dependencies
-        run: pnpm exec playwright install-deps
+        run: pnpm exec playwright-core install-deps
 
       - name: Run tests
         env:
