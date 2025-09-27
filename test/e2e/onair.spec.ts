@@ -50,10 +50,19 @@ test.describe('本番操作(OnAir)', () => {
     }
   });
 
+  // 各テストの前にログイン処理を実行
+  test.beforeEach(async ({ page }) => {
+    test.skip(!canRunTest, 'テスト用の環境変数が設定されていません');
+    await page.goto('/admin/login');
+    await page.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
+    await page.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
+    await page.getByRole('button', { name: 'ログイン' }).click();
+    // ログイン後のページ遷移を待機
+    await expect(page.getByRole('heading', { name: '演出管理' })).toBeVisible();
+  });
+
   // テストケース: 演出の実行が正常に行えること
   test('演出の実行が正常に行えること', async ({ page }) => {
-    // テスト実行不可の場合はスキップ
-    test.skip(!canRunTest, 'テスト用の環境変数が設定されていません');
     // テスト用の演出データがなければスキップ
     if (!testCue) {
       test.skip(true, 'テスト用の演出データが作成されていません');
@@ -62,6 +71,7 @@ test.describe('本番操作(OnAir)', () => {
 
     // 本番操作ページにアクセス
     await page.goto('/admin/onair');
+    await expect(page.getByRole('heading', { name: 'ライブ本番操作' })).toBeVisible();
 
     // 1. 作成した演出のボタンが表示されていることを確認
     const cueButton = page.getByRole('button', { name: 'Onair Test Cue' });

@@ -1,12 +1,22 @@
 import { test, expect } from '@playwright/test';
 
+const hasAuthEnv = process.env.SUPABASE_TEST_EMAIL && process.env.SUPABASE_TEST_PASSWORD;
+
 // テストスイート: 演出管理ページ
 test.describe('演出管理(Cues)', () => {
-  // test.beforeEach(...) のログイン処理を削除
+  // 各テストの前にログイン処理を実行
+  test.beforeEach(async ({ page }) => {
+    test.skip(!hasAuthEnv, 'テスト用の認証情報が設定されていません');
+    await page.goto('/admin/login');
+    await page.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
+    await page.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
+    await page.getByRole('button', { name: 'ログイン' }).click();
+    // ログイン後のページ遷移を待機
+    await expect(page.getByRole('heading', { name: '演出管理' })).toBeVisible();
+  });
 
   // 各テストの開始時に、直接ページにアクセスする
   test('演出のCRUD操作が正常に行えること', async ({ page }) => {
-    await page.goto('/admin/cues');
     const cueName = 'テストカラー';
     const cueNameUpdated = 'テストカラー編集済み';
     const cueType = '単色';

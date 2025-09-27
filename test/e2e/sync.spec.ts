@@ -56,9 +56,8 @@ test.describe('リアルタイム同期', () => {
     }
 
     // 観客と管理者、2つのブラウザコンテキストを作成
-    // 観客は認証不要、管理者はsetupで保存した認証情報を使う
     const audienceContext = await browser.newContext();
-    const adminContext = await browser.newContext({ storageState: 'playwright/.auth/user.json' });
+    const adminContext = await browser.newContext();
 
     const pageA = await audienceContext.newPage(); // 観客ページ
     const pageB = await adminContext.newPage(); // 管理者ページ
@@ -68,9 +67,16 @@ test.describe('リアルタイム同期', () => {
     const waitingHeading = pageA.getByRole('heading', { name: 'Waiting...' });
     await expect(waitingHeading).toBeVisible();
 
-    // 2. 管理者ページ (pageB) のセットアップ
+    // 2. 管理者ページ (pageB) でログインし、セットアップ
+    await pageB.goto('/admin/login');
+    await pageB.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
+    await pageB.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
+    await pageB.getByRole('button', { name: 'ログイン' }).click();
+    await expect(pageB.getByRole('heading', { name: '演出管理' })).toBeVisible();
+
+    // 本番操作ページに遷移
     await pageB.goto('/admin/onair');
-    await expect(pageB).toHaveURL('/admin/onair');
+    await expect(pageB.getByRole('heading', { name: 'ライブ本番操作' })).toBeVisible();
 
     // 3. 管理者が演出を実行
     await pageB.getByRole('button', { name: 'Sync Test Cue' }).click();
