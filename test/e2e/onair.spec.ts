@@ -55,17 +55,20 @@ test.describe('本番操作(OnAir)', () => {
     // テスト実行不可の場合はスキップ
     test.skip(!canRunTest, 'テスト用の環境変数が設定されていません');
 
-    // ログインページにアクセス
-    await page.goto('/admin/login');
+  // ログインページにアクセス
+  await page.goto('/admin/login');
 
-    // 認証情報を入力してログイン
-    await page.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
-    await page.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
-    await page.getByRole('button', { name: 'ログイン' }).click();
+  // 認証情報を入力してログイン
+  await page.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
+  await page.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
+  await page.getByRole('button', { name: 'ログイン' }).click();
 
-    // 本番操作ページに遷移
-    await page.goto('/admin/onair');
-    await expect(page).toHaveURL('/admin/onair');
+  // ログイン成功を確認（管理画面トップへの遷移を待つ）
+  await expect(page).toHaveURL(/\/admin\/(cues|onair)/);
+
+  // 本番操作ページに遷移
+  await page.goto('/admin/onair');
+  await expect(page).toHaveURL('/admin/onair');
   });
 
   // テストケース: 演出の実行が正常に行えること
@@ -84,8 +87,8 @@ test.describe('本番操作(OnAir)', () => {
     await cueButton.click();
 
     // 3. 「成功」というタイトルのトーストが表示されることを確認
-    const toastTitle = page.locator('h3').filter({ hasText: '成功' });
-    await expect(toastTitle).toBeVisible();
+    const toastAlert = page.getByRole('alert', { name: '成功' });
+    await expect(toastAlert).toBeVisible();
 
     // 4. (任意) データベースを直接確認し、live_stateが更新されていることを検証
     const { data: liveState, error } = await supabaseAdmin.from('live_state').select('*').single();
