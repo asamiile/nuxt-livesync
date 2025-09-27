@@ -1,6 +1,10 @@
 // playwright.config.ts
 
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+// .env ファイルを読み込む
+dotenv.config();
 
 const authFile = 'playwright/.auth/user.json';
 
@@ -56,5 +60,9 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL || '',
+      SUPABASE_KEY: process.env.SUPABASE_KEY || '',
+    },
   },
 });

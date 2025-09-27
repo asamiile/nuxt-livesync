@@ -17,10 +17,8 @@ jobs:
       run: npm install -g pnpm && pnpm install
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
-    - name: Build
-      run: pnpm build
     - name: Run Playwright tests
-      run: pnpm exec playwright test
+      run: pnpm test:e2e
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}

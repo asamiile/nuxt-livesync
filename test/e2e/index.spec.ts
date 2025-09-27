@@ -22,3 +22,15 @@ test.describe('トップページ', () => {
     await expect(heading).toBeVisible();
   });
 });
+
+// テストスイート: ログインページのテスト
+test.describe('ログインページ', () => {
+  // テストケース: ページタイトルが正しいこと
+  test('ページタイトルが正しく表示されること', async ({ page }) => {
+    // 1. ログインページにアクセス
+    await page.goto('/admin/login');
+
+    // 2. ページのタイトルが 'ログイン' を含んでいることを確認
+    await expect(page).toHaveTitle(/ログイン/);
+  });
+});
