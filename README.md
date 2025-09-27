@@ -121,3 +121,9 @@ pnpm run test
 ```bash
 pnpm test:e2e
 ```
+
+- Run E2E Test with UI Mode
+
+```bash
+pnpm exec playwright test --ui
+```

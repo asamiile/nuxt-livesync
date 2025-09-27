@@ -17,6 +17,9 @@ dependencies:
   clsx:
     specifier: ^2.1.1
     version: 2.1.1
+  dotenv:
+    specifier: ^17.2.2
+    version: 17.2.2
   lucide-vue-next:
     specifier: ^0.544.0
     version: 0.544.0(vue@3.5.21)
