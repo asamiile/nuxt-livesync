@@ -36,40 +36,59 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+    // 認証セットアップ用のプロジェクト
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
     {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // 認証が必要なテストは、保存された認証情報を使用する
+        storageState: 'playwright/.auth/user.json',
+      },
+      // 認証セットアップに依存させる
+      dependencies: ['setup'],
+      // このプロジェクトで実行するテストファイルを指定
+      testIgnore: /auth\.spec\.ts/,
+    },
+
+    // 認証が不要なテスト用のプロジェクト (auth.spec.tsなど)
+    {
+      name: 'chromium-unauthenticated',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /auth\.spec\.ts/,
+    },
+
+    // ... (FirefoxとWebKitも同様に設定) ...
+    {
       name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
+      testIgnore: /auth\.spec\.ts/,
+    },
+    {
+      name: 'firefox-unauthenticated',
       use: { ...devices['Desktop Firefox'] },
+      testMatch: /auth\.spec\.ts/,
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
+      testIgnore: /auth\.spec\.ts/,
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    {
+      name: 'webkit-unauthenticated',
+      use: { ...devices['Desktop Safari'] },
+      testMatch: /auth\.spec\.ts/,
+    },
   ],
 
   /* Run your local dev server before starting the tests */

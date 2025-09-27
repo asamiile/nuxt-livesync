@@ -1,16 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// 環境変数が設定されているか確認
-const hasAuthEnv = process.env.SUPABASE_TEST_EMAIL && process.env.SUPABASE_TEST_PASSWORD;
-
 // テストスイート: 認証機能
-// 環境変数が設定されていない場合はスキップ
 test.describe('認証機能', () => {
   // テストケース: ログイン・ログアウトが正常に行えること
   test('ログイン・ログアウトが正常に行えること', async ({ page }) => {
-    // 環境変数がなければテストをスキップ
-    test.skip(!hasAuthEnv, 'テスト用の認証情報が設定されていません');
-
     // 1. ログインページにアクセス
     await page.goto('/admin/login');
 
@@ -71,9 +64,6 @@ test.describe('認証機能', () => {
 
   // テストケース: 認証済みでログインページにアクセスするとリダイレクトされること
   test('認証済みでログインページにアクセスするとリダイレクトされること', async ({ page }) => {
-    // 環境変数がなければテストをスキップ
-    test.skip(!hasAuthEnv, 'テスト用の認証情報が設定されていません');
-
     // 1. ログイン処理
     await page.goto('/admin/login');
     await page.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
