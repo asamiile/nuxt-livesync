@@ -1,10 +1,5 @@
 // playwright.config.ts
-
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
-
-// .env ファイルを読み込む (プロジェクトルートから自動で検索される)
-dotenv.config();
 
 const authFile = 'playwright/.auth/user.json';
 
@@ -22,10 +17,7 @@ export default defineConfig({
   },
 
   projects: [
-    // 最初に認証を行い、結果を storageState に保存する
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
-
-    // setup に依存するテストを各ブラウザで実行する
     {
       name: 'chromium',
       use: {
@@ -33,7 +25,7 @@ export default defineConfig({
         storageState: authFile,
       },
       dependencies: ['setup'],
-      testIgnore: /.*\.setup\.ts/, // setup自体はこのプロジェクトで再実行しない
+      testIgnore: /.*\.setup\.ts/,
     },
     {
       name: 'firefox',
@@ -56,16 +48,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm preview',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
-    env: {
-      SUPABASE_URL: process.env.SUPABASE_URL || '',
-      SUPABASE_KEY: process.env.SUPABASE_KEY || '',
-      SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || '',
-      SUPABASE_TEST_EMAIL: process.env.SUPABASE_TEST_EMAIL || '',
-      SUPABASE_TEST_PASSWORD: process.env.SUPABASE_TEST_PASSWORD || '',
-    },
   },
 });

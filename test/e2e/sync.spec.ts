@@ -56,8 +56,10 @@ test.describe('リアルタイム同期', () => {
     }
 
     // 観客と管理者、2つのブラウザコンテキストを作成
+    // 観客は認証不要、管理者はsetupで保存した認証情報を使う
     const audienceContext = await browser.newContext();
-    const adminContext = await browser.newContext();
+    const adminContext = await browser.newContext({ storageState: 'playwright/.auth/user.json' });
+
     const pageA = await audienceContext.newPage(); // 観客ページ
     const pageB = await adminContext.newPage(); // 管理者ページ
 
@@ -67,10 +69,6 @@ test.describe('リアルタイム同期', () => {
     await expect(waitingHeading).toBeVisible();
 
     // 2. 管理者ページ (pageB) のセットアップ
-    await pageB.goto('/admin/login');
-    await pageB.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
-    await pageB.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
-    await pageB.getByRole('button', { name: 'ログイン' }).click();
     await pageB.goto('/admin/onair');
     await expect(pageB).toHaveURL('/admin/onair');
 
