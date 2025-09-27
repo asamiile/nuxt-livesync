@@ -4,7 +4,6 @@ import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 
 // .env ファイルを読み込む (プロジェクトルートから自動で検索される)
-// これはテストランナーのプロセス（テストファイル自体）で process.env を読むために必要
 dotenv.config();
 
 const authFile = 'playwright/.auth/user.json';
@@ -57,10 +56,16 @@ export default defineConfig({
   ],
 
   webServer: {
-    // dotenv-cli を使って強制的に環境変数を注入してから開発サーバーを起動する
-    command: 'pnpm exec dotenv -- pnpm dev',
+    command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL || '',
+      SUPABASE_KEY: process.env.SUPABASE_KEY || '',
+      SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || '',
+      SUPABASE_TEST_EMAIL: process.env.SUPABASE_TEST_EMAIL || '',
+      SUPABASE_TEST_PASSWORD: process.env.SUPABASE_TEST_PASSWORD || '',
+    },
   },
 });
