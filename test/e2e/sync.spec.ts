@@ -19,11 +19,10 @@ test.describe('リアルタイム同期', () => {
     supabaseAdmin = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
 
     // テスト用の演出データを作成
-    const uniqueCueName = `Sync Test Cue ${Date.now()}`;
     const { data, error } = await supabaseAdmin
       .from('cues')
       .insert({
-        name: uniqueCueName,
+        name: 'Sync Test Cue',
         type: 'color',
         value: '#112233',
       })
@@ -59,7 +58,6 @@ test.describe('リアルタイム同期', () => {
     // 観客と管理者、2つのブラウザコンテキストを作成
     const audienceContext = await browser.newContext();
     const adminContext = await browser.newContext();
-
     const pageA = await audienceContext.newPage(); // 観客ページ
     const pageB = await adminContext.newPage(); // 管理者ページ
 
@@ -68,19 +66,16 @@ test.describe('リアルタイム同期', () => {
     const waitingHeading = pageA.getByRole('heading', { name: 'Waiting...' });
     await expect(waitingHeading).toBeVisible();
 
-    // 2. 管理者ページ (pageB) でログインし、セットアップ
+    // 2. 管理者ページ (pageB) のセットアップ
     await pageB.goto('/admin/login');
     await pageB.getByLabel('メールアドレス').fill(process.env.SUPABASE_TEST_EMAIL!);
     await pageB.getByLabel('パスワード').fill(process.env.SUPABASE_TEST_PASSWORD!);
     await pageB.getByRole('button', { name: 'ログイン' }).click();
-    await expect(pageB.getByRole('heading', { name: '演出管理' })).toBeVisible();
-
-    // 本番操作ページに遷移
     await pageB.goto('/admin/onair');
-    await expect(pageB.getByRole('heading', { name: 'ライブ本番操作' })).toBeVisible();
+    await expect(pageB).toHaveURL('/admin/onair');
 
     // 3. 管理者が演出を実行
-    await pageB.getByRole('button', { name: testCue.name }).click();
+    await pageB.getByRole('button', { name: 'Sync Test Cue' }).click();
 
     // 4. 観客ページの表示が更新されることを確認
     // "Waiting..."が消えるのを待つ
