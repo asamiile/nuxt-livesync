@@ -14,7 +14,10 @@ setup('authenticate', async ({ page }) => {
   await page.getByRole('button', { name: 'ログイン' }).click();
 
   // ログイン後のページにリダイレクトされていることを確認
-  await expect(page).toHaveURL('/admin/cues');
+  // await expect(page).toHaveURL('/admin/cues');
+
+  // リダイレクト先のページの特定の要素が表示される
+  await expect(page.getByRole('heading', { name: '演出管理' })).toBeVisible();
 
   // 認証情報をファイルに保存
   await page.context().storageState({ path: authFile });

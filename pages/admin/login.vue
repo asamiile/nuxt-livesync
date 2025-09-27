@@ -51,7 +51,7 @@ const handleLogin = async () => {
           管理者ログイン
         </h2>
       </div>
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
+      <form class="mt-8 space-y-6" method="post" @submit.prevent="handleLogin">
         <div class="rounded-md shadow-sm space-y-4">
           <div>
             <Label for="email-address">メールアドレス</Label>
