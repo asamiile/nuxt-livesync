@@ -2,10 +2,9 @@
 
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import path from 'path';
 
-// .env ファイルのパスを明示的に指定して読み込む
-dotenv.config({ path: path.resolve(__dirname, './.env') });
+// .env ファイルを読み込む (プロジェクトルートから自動で検索される)
+dotenv.config();
 
 const authFile = 'playwright/.auth/user.json';
 
