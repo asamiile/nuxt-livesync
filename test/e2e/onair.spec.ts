@@ -21,10 +21,11 @@ test.describe('本番操作(OnAir)', () => {
     supabaseAdmin = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
 
     // テスト用の演出データを作成
+    const uniqueCueName = `Onair Test Cue ${Date.now()}`;
     const { data, error } = await supabaseAdmin
       .from('cues')
       .insert({
-        name: 'Onair Test Cue',
+        name: uniqueCueName,
         type: 'color',
         value: '#ff00ff',
       })
@@ -74,7 +75,7 @@ test.describe('本番操作(OnAir)', () => {
     await expect(page.getByRole('heading', { name: 'ライブ本番操作' })).toBeVisible();
 
     // 1. 作成した演出のボタンが表示されていることを確認
-    const cueButton = page.getByRole('button', { name: 'Onair Test Cue' });
+    const cueButton = page.getByRole('button', { name: testCue.name });
     await expect(cueButton).toBeVisible();
 
     // 2. 演出ボタンをクリック

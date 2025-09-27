@@ -1,6 +1,9 @@
 // playwright.config.ts
-
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+// .envファイルを読み込む
+dotenv.config();
 
 export default defineConfig({
   testDir: './test/e2e',
@@ -31,9 +34,16 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'pnpm preview',
+    command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_KEY: process.env.SUPABASE_KEY!,
+      SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY!,
+      SUPABASE_TEST_EMAIL: process.env.SUPABASE_TEST_EMAIL!,
+      SUPABASE_TEST_PASSWORD: process.env.SUPABASE_TEST_PASSWORD!,
+    },
   },
 });

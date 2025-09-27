@@ -19,10 +19,11 @@ test.describe('リアルタイム同期', () => {
     supabaseAdmin = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
 
     // テスト用の演出データを作成
+    const uniqueCueName = `Sync Test Cue ${Date.now()}`;
     const { data, error } = await supabaseAdmin
       .from('cues')
       .insert({
-        name: 'Sync Test Cue',
+        name: uniqueCueName,
         type: 'color',
         value: '#112233',
       })
@@ -79,7 +80,7 @@ test.describe('リアルタイム同期', () => {
     await expect(pageB.getByRole('heading', { name: 'ライブ本番操作' })).toBeVisible();
 
     // 3. 管理者が演出を実行
-    await pageB.getByRole('button', { name: 'Sync Test Cue' }).click();
+    await pageB.getByRole('button', { name: testCue.name }).click();
 
     // 4. 観客ページの表示が更新されることを確認
     // "Waiting..."が消えるのを待つ

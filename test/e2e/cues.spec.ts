@@ -29,7 +29,7 @@ test.describe('演出管理(Cues)', () => {
 
       // 2. フォームに情報を入力
       await page.getByLabel('演出名').fill(cueName);
-      await page.getByLabel('種類').click();
+      await page.getByRole('combobox', { name: '種類' }).click();
       await page.getByRole('option', { name: cueType }).click();
       await page.getByLabel('値').fill(cueValue);
 
