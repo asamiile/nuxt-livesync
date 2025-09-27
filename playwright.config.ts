@@ -1,11 +1,6 @@
 // playwright.config.ts
 
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
-import path from 'path';
-
-// .envファイルを読み込む（ユーザーご指摘の通り修正）
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const authFile = 'playwright/.auth/user.json';
 
@@ -23,11 +18,10 @@ export default defineConfig({
   },
 
   projects: [
-    // ステップ1: まず認証を行い、状態を保存する
+    // 最初に認証を行い、結果を storageState に保存する
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
-    // ステップ2: 認証が必要なテストを各ブラウザで実行する
-    // testIgnoreを設定して、認証セットアップ自体は除外する
+    // setup に依存するテストを各ブラウザで実行する
     {
       name: 'chromium',
       use: {
@@ -35,7 +29,7 @@ export default defineConfig({
         storageState: authFile,
       },
       dependencies: ['setup'],
-      testIgnore: /.*\.setup\.ts/,
+      testIgnore: /.*\.setup\.ts/, // setup自体はこのプロジェクトで再実行しない
     },
     {
       name: 'firefox',
@@ -58,15 +52,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm preview',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    // webServerプロセスに環境変数を直接渡す
-    env: {
-      SUPABASE_URL: process.env.SUPABASE_URL || '',
-      SUPABASE_KEY: process.env.SUPABASE_KEY || '',
-    },
-    // サーバーの起動タイムアウトを延長
     timeout: 120 * 1000,
   },
 });
