@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "test:e2e": "dotenv -- pnpm build && dotenv -- playwright test",
+    "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
