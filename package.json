@@ -41,6 +41,7 @@
     "@types/node": "^18.17.5",
     "@vitest/ui": "3.2.4",
     "@vue/test-utils": "^2.4.6",
+    "dotenv": "^17.2.2",
     "happy-dom": "^18.0.1",
     "playwright-core": "^1.55.0",
     "shadcn-nuxt": "^2.2.0",

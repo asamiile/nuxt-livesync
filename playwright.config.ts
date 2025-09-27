@@ -4,9 +4,16 @@ import { defineConfig, devices } from '@playwright/test';
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
+// 必要な環境変数が設定されているか確認
+if (!process.env.SUPABASE_TEST_EMAIL || !process.env.SUPABASE_TEST_PASSWORD) {
+  throw new Error(
+    'SUPABASE_TEST_EMAILとSUPABASE_TEST_PASSWORDを.envファイルに設定してください。',
+  );
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
