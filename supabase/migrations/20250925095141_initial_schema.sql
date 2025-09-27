@@ -1,7 +1,7 @@
 -- supabase/migrations/_initial_schema.sql
 
--- 1. 演出リストを保存する "cues" テーブルを作成
-CREATE TABLE public.cues (
+-- 1. 演出リストを保存する "cues" テーブルを作成（存在しない場合のみ）
+CREATE TABLE IF NOT EXISTS public.cues (
     id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
     name text NOT NULL,
     type text NOT NULL,
@@ -9,17 +9,17 @@ CREATE TABLE public.cues (
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
--- 2. リアルタイム通知のトリガーとなる "live_state" テーブルを作成
+-- 2. リアルタイム通知のトリガーとなる "live_state" テーブルを作成（存在しない場合のみ）
 -- このテーブルは常に1行だけのデータを保持します
-CREATE TABLE public.live_state (
+CREATE TABLE IF NOT EXISTS public.live_state (
     id smallint NOT NULL PRIMARY KEY DEFAULT 1,
     active_cue_id uuid REFERENCES public.cues(id) ON DELETE SET NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT single_row_check CHECK (id = 1)
 );
 
--- 3. live_stateテーブルに初期データを1行だけ挿入
-INSERT INTO public.live_state (id) VALUES (1);
+-- 3. live_stateテーブルに初期データを1行だけ挿入（id=1が存在しない場合のみ）
+INSERT INTO public.live_state (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
 -- 4. テーブルの変更をリアルタイムで通知できるように設定
 ALTER TABLE public.cues REPLICA IDENTITY FULL;
