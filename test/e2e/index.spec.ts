@@ -30,7 +30,8 @@ test.describe('ログインページ', () => {
     // 1. ログインページにアクセス
     await page.goto('/admin/login');
 
-    // 2. ページのタイトルが 'ログイン' を含んでいることを確認
-    await expect(page).toHaveTitle(/ログイン/);
+    // 2. '管理者ログイン' というテキストを持つh2要素が表示されていることを確認
+    const heading = page.getByRole('heading', { name: '管理者ログイン' });
+    await expect(heading).toBeVisible();
   });
 });
